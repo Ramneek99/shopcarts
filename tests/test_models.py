@@ -18,12 +18,14 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #  <your resource name>   M O D E L   T E S T   C A S E S
 ######################################################################
+
+
 class TestYourResourceModel(unittest.TestCase):
-    """ Test Cases for YourResourceModel Model """
+    """Test Cases for YourResourceModel Model"""
 
     @classmethod
     def setUpClass(cls):
-        """ This runs once before the entire test suite """
+        """This runs once before the entire test suite"""
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
@@ -32,16 +34,16 @@ class TestYourResourceModel(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
+        """This runs once after the entire test suite"""
         db.session.close()
 
     def setUp(self):
-        """ This runs before each test """
+        """This runs before each test"""
         db.session.query(Pet).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
-        """ This runs after each test """
+        """This runs after each test"""
         db.session.remove()
 
     ######################################################################
@@ -49,5 +51,5 @@ class TestYourResourceModel(unittest.TestCase):
     ######################################################################
 
     def test_XXXX(self):
-        """ It should always be true """
+        """It should always be true"""
         self.assertTrue(True)

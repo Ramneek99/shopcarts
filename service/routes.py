@@ -4,9 +4,8 @@ My Service
 Describe what your service does here
 """
 
-import os
-import sys
-import logging
+
+from service.models import Shopcart
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .utils import status  # HTTP Status Codes
 
@@ -21,11 +20,18 @@ from . import app
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/")
 def index():
-    """ Root URL response """
+    """Root URL response"""
+    app.logger.info("Request for Root URL")
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Shopcart Demo REST API Service",
+            version="1.0",
+            paths=url_for("list_shopcarts", _external=True),
+        ),
         status.HTTP_200_OK,
     )
 
@@ -36,6 +42,6 @@ def index():
 
 
 def init_db():
-    """ Initializes the SQLAlchemy app """
+    """Initializes the SQLAlchemy app"""
     global app
     YourResourceModel.init_db(app)
