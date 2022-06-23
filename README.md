@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
-
+[![Build Status](https://github.com/DevopsShopcarts/shopcarts/actions/workflows/workflow.yml/badge.svg)](https://github.com/DevopsShopcarts/shopcarts/actions)
 This is a skeleton you can use to start your projects
 
 ## Overview
