@@ -4,34 +4,22 @@ My Service
 Describe what your service does here
 """
 
-
-from service.models import Shopcart
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .utils import status  # HTTP Status Codes
-
-# For this example we'll use SQLAlchemy, a popular ORM that supports a
-# variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import YourResourceModel, DataValidationError
+from service.models import YourResourceModel
 
 # Import Flask application
 from . import app
 
+
 ######################################################################
 # GET INDEX
 ######################################################################
-
-
 @app.route("/")
 def index():
     """Root URL response"""
-    app.logger.info("Request for Root URL")
     return (
-        jsonify(
-            name="Shopcart Demo REST API Service",
-            version="1.0",
-            paths=url_for("list_shopcarts", _external=True),
-        ),
+        "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
 

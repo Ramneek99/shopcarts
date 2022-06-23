@@ -71,7 +71,8 @@ class Shopcart(db.Model):
             raise DataValidationError("Invalid Shopcart: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Shopcart: body of request contained bad or no data" + str(error)
+                "Invalid Shopcart: body of request contained bad or no data - "
+                "Error message: " + error
             )
         return self
 

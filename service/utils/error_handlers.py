@@ -22,11 +22,10 @@ from service.models import DataValidationError
 from service import app
 from . import status
 
+
 ######################################################################
 # Error Handlers
 ######################################################################
-
-
 @app.errorhandler(DataValidationError)
 def request_validation_error(error):
     """Handles Value Errors from bad data"""
