@@ -11,24 +11,24 @@ from service.models import YourResourceModel, DataValidationError, db
 #  <your resource name>   M O D E L   T E S T   C A S E S
 ######################################################################
 class TestYourResourceModel(unittest.TestCase):
-    """ Test Cases for YourResourceModel Model """
+    """Test Cases for YourResourceModel Model"""
 
     @classmethod
     def setUpClass(cls):
-        """ This runs once before the entire test suite """
+        """This runs once before the entire test suite"""
         pass
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
+        """This runs once after the entire test suite"""
         pass
 
     def setUp(self):
-        """ This runs before each test """
+        """This runs before each test"""
         pass
 
     def tearDown(self):
-        """ This runs after each test """
+        """This runs after each test"""
         pass
 
     ######################################################################
@@ -36,5 +36,5 @@ class TestYourResourceModel(unittest.TestCase):
     ######################################################################
 
     def test_XXXX(self):
-        """ It should always be true """
+        """It should always be true"""
         self.assertTrue(True)
