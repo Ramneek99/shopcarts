@@ -27,21 +27,30 @@ class ShopCart(db.Model):
     app = None
 
     # Table Schema
-    user_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
-    items = db.Column(ARRAY(JSON))
+    # customer_id
+    # product_id
+    # product_name
+    # quantity
+    # price
+    customer_id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(300), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
     
     def __repr__(self):
-        return "<ShopCart %s user_id=[%s]>" % (self.name, self.user_id)
+        return "<ShopCart customer_id=[%s]>" % (self.customer_id)
 
-    def create(self, user_id, name):
+    def create(self, customer_id, product_id, product_name, quantity, price):
         """
         Creates a ShopCart to the database
         """
-        logger.info("Creating %s", self.name)
-        self.name = name
-        self.user_id = user_id  # id must be user id to generate next primary key
-        self.items = []
+        logger.info("Creating %d", self.customer_id)
+        self.customer_id = customer_id  # id must be user id to generate next primary key
+        self.product_id = product_id
+        self.product_name = product_name
+        self.quantity = quantity
+        sel.price = price
         db.session.add(self)
         db.session.commit()
 
@@ -49,18 +58,18 @@ class ShopCart(db.Model):
         """
         Updates a ShopCart to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Saving %d", self.customer_id)
         db.session.commit()
 
     def delete(self):
         """Removes a ShopCart from the data store"""
-        logger.info("Deleting %s", self.name)
+        logger.info("Deleting %d", self.customer_id)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
         """Serializes a ShopCart into a dictionary"""
-        return {"user_id": self.user_id, "items": self.items}
+        return {"customer_id": self.customer_id, "items": self.items}
 
     def deserialize(self, data):
         """
@@ -70,8 +79,7 @@ class ShopCart(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.user_id = data["user_id"]
-            self.items = data["items"]
+            self.customer_id = data["customer_id"]
         except KeyError as error:
             raise DataValidationError("Invalid ShopCart: missing " + error.args[0])
         except TypeError as error:
@@ -99,16 +107,25 @@ class ShopCart(db.Model):
 
     @classmethod
     def find(cls, by_id):
-        """Finds a ShopCart by it's ID"""
+        """Finds a ShopCart by it's user id"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_product_name(cls, product_name):
         """Returns all ShopCarts with the given name
 
         Args:
-            name (string): the name of the ShopCarts you want to match
+            product_name (string): the name of the product you want to match
         """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+        logger.info("Processing name query for %s ...", product_name)
+        return cls.query.filter(cls.product_name == product_name)
+
+    @classmethod
+    def addItem(cls, customer_id, ):
+        """Add a new item info to items list"""
+        logger.info("Processing update query for %d ...", customer_id)
+        shopCart = cls.find(customer_id)
+        shopCart.product_id = product_id
+        shopCart.
+        db.session.commit()

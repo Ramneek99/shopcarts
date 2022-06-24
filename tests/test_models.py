@@ -5,7 +5,7 @@ Test cases for YourResourceModel Model
 import unittest
 from datetime import date
 from werkzeug.exceptions import NotFound
-from service.models import Pet, Gender, DataValidationError, Shopcart, db
+from service.models import Pet, Gender, DataValidationError, ShopCart, Shopcart, db
 from service import app
 from tests.factories import PetFactory
 
@@ -28,7 +28,7 @@ class TestYourResourceModel(unittest.TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        Shopcart.init_db(app)
+        ShopCart.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -47,7 +47,9 @@ class TestYourResourceModel(unittest.TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
-
+    def test_addItem(self):
+        db.session.
     def test_XXXX(self):
         """It should always be true"""
+        
         self.assertTrue(True)
