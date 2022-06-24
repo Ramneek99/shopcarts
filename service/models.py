@@ -4,6 +4,7 @@ Models for ShopCart
 All of the models are stored in this module
 """
 import logging
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ARRAY, JSON
 

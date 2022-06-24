@@ -8,7 +8,7 @@ from sqlalchemy import null
 from werkzeug.exceptions import NotFound
 from service.models import Pet, Gender, DataValidationError, ShopCart, Shopcart, db
 from service import app
-from tests.factories import PetFactory
+from tests.factories import ShopCartFactory 
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
