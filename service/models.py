@@ -106,10 +106,10 @@ class ShopCart(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
+    def find(cls, customer_id, product_id):
         """Finds a ShopCart by it's user id"""
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+        logger.info("Processing lookup for customer_id: %d and product_id: %d ...", customer_id, product_id)
+        return cls.query.get({"customer_id": customer_id, "product_id": product_id})
 
     @classmethod
     def find_by_product_name(cls, product_name):
@@ -122,10 +122,9 @@ class ShopCart(db.Model):
         return cls.query.filter(cls.product_name == product_name)
 
     @classmethod
-    def addItem(cls, customer_id, ):
+    def addItem(cls, customer_id, product_id, quantity):
         """Add a new item info to items list"""
         logger.info("Processing update query for %d ...", customer_id)
-        shopCart = cls.find(customer_id)
-        shopCart.product_id = product_id
-        shopCart.
+        shopCart = ShopCart.find(customer_id=customer_id, product_id=product_id)
+        shopCart.quantity += quantity
         db.session.commit()
