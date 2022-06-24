@@ -15,23 +15,24 @@
 """
 Test Factory to make fake objects for testing
 """
-from random import random
+import random
 import factory
 from factory.fuzzy import FuzzyChoice
 from service.models import ShopCart
 
 
 class ShopCartFactory(factory.Factory):
-    """Creates fake shopcarts"""
-    MIN_PRICE = 10.0
-    MAX_PRICE = 1000.0
+    """Creates fake shopCarts"""
+    
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
-
         model = ShopCart
 
+    # MIN_PRICE = 10.0
+    # MAX_PRICE = 1000.0
+    
     customer_id = factory.Sequence(lambda n: n)
     product_id = factory.Sequence(lambda n: n)
     product_name = FuzzyChoice(choices=["apple", "cake", "coffee", "cabbage"])
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
-    price = factory.LazyAttribute(random.randrange(MIN_PRICE, MAX_PRICE + 1))
+    price = factory.LazyAttribute(random.randrange(10.0, 1000.0))

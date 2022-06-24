@@ -51,7 +51,7 @@ class ShopCart(db.Model):
         self.product_id = product_id
         self.product_name = product_name
         self.quantity = quantity
-        sel.price = price
+        self.price = price
         db.session.add(self)
         db.session.commit()
 

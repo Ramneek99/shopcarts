@@ -2,11 +2,13 @@
 Test cases for YourResourceModel Model
 
 """
+import logging
+import os
 import unittest
 from datetime import date
 from sqlalchemy import null
 from werkzeug.exceptions import NotFound
-from service.models import Pet, Gender, DataValidationError, ShopCart, Shopcart, db
+from service.models import DataValidationError, ShopCart, db
 from service import app
 from tests.factories import ShopCartFactory 
 
@@ -38,7 +40,7 @@ class TestYourResourceModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(Pet).delete()  # clean up the last tests
+        db.session.query(ShopCart).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -48,27 +50,23 @@ class TestYourResourceModel(unittest.TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
-    def test_createItem(self):
+    def test_createShopCart(self):
         """This test will test the function to create a shopCart"""
-        customer_id = 0
-        product_id = 123
-        product_name = "iPhone13"
-        quantity = 1
-        price = 80.0
+        shopCart = ShopCartFactory()
         ShopCart.create(
-            customer_id=customer_id,
-            product_id=product_id,
-            product_name=product_name,
-            quantity=quantity,
-            price=price
+            customer_id=shopCart.customer_id,
+            product_id=shopCart.product_id,
+            product_name=shopCart.product_name,
+            quantity=shopCart.quantity,
+            price=shopCart.price
         )
-        shopCart = ShopCart.find(customer_id=customer_id, product_id=product_id)
-        self.assertTrue(shopCart!=null)
-        self.assertTrue(shopCart.customer_id==customer_id)
-        self.assertTrue(shopCart.product_id==product_id)
-        self.assertTrue(shopCart.product_name==product_name)
-        self.assertTrue(shopCart.quantity==quantity)
-        self.assertTrue(shopCart.price==price)
+        shopCartFound = ShopCart.find(customer_id=shopCart.customer_id, product_id=shopCart.product_id)
+        self.assertTrue(shopCartFound!=null)
+        self.assertTrue(shopCartFound.customer_id==shopCart.customer_id)
+        self.assertTrue(shopCartFound.product_id==shopCart.product_id)
+        self.assertTrue(shopCartFound.product_name==shopCart.product_name)
+        self.assertTrue(shopCartFound.quantity==shopCart.quantity)
+        self.assertTrue(shopCartFound.price==shopCart.price)
 
 
 
