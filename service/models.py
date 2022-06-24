@@ -1,10 +1,11 @@
 """
-Models for Shopcart
+Models for ShopCart
 
 All of the models are stored in this module
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import ARRAY, JSON
 
 logger = logging.getLogger("flask.app")
 
@@ -18,9 +19,9 @@ class DataValidationError(Exception):
     pass
 
 
-class Shopcart(db.Model):
+class ShopCart(db.Model):
     """
-    Class that represents a Shopcart
+    Class that represents a ShopCart
     """
 
     app = None
@@ -28,50 +29,54 @@ class Shopcart(db.Model):
     # Table Schema
     user_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63))
-
+    items = db.Column(ARRAY(JSON))
+    
     def __repr__(self):
-        return "<Shopcart %r id=[%s]>" % (self.name, self.id)
+        return "<ShopCart %s user_id=[%s]>" % (self.name, self.user_id)
 
-    def create(self):
+    def create(self, user_id, name):
         """
-        Creates a Shopcart to the database
+        Creates a ShopCart to the database
         """
         logger.info("Creating %s", self.name)
-        self.id = None  # id must be none to generate next primary key
+        self.name = name
+        self.user_id = user_id  # id must be user id to generate next primary key
+        self.items = []
         db.session.add(self)
         db.session.commit()
 
     def update(self):
         """
-        Updates a Shopcart to the database
+        Updates a ShopCart to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """Removes a Shopcart from the data store"""
+        """Removes a ShopCart from the data store"""
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """Serializes a Shopcart into a dictionary"""
-        return {"id": self.id, "name": self.name}
+        """Serializes a ShopCart into a dictionary"""
+        return {"user_id": self.user_id, "items": self.items}
 
     def deserialize(self, data):
         """
-        Deserializes a Shopcart from a dictionary
+        Deserializes a ShopCart from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.name = data["name"]
+            self.user_id = data["user_id"]
+            self.items = data["items"]
         except KeyError as error:
-            raise DataValidationError("Invalid Shopcart: missing " + error.args[0])
+            raise DataValidationError("Invalid ShopCart: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Shopcart: body of request contained bad or no data - "
+                "Invalid ShopCart: body of request contained bad or no data - "
                 "Error message: " + error
             )
         return self
@@ -88,22 +93,22 @@ class Shopcart(db.Model):
 
     @classmethod
     def all(cls):
-        """Returns all of the Shopcarts in the database"""
-        logger.info("Processing all Shopcarts")
+        """Returns all of the ShopCarts in the database"""
+        logger.info("Processing all ShopCarts")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """Finds a Shopcart by it's ID"""
+        """Finds a ShopCart by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all Shopcarts with the given name
+        """Returns all ShopCarts with the given name
 
         Args:
-            name (string): the name of the Shopcarts you want to match
+            name (string): the name of the ShopCarts you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
