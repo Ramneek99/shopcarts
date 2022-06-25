@@ -1,5 +1,5 @@
 """
-Models for Shopcart
+Models for ShopCart
 
 All of the models are stored in this module
 """
@@ -18,25 +18,14 @@ class DataValidationError(Exception):
     pass
 
 
-class Shopcart(db.Model):
-    """
-    Class that represents a Shopcart
-    """
-
-    app = None
-
-    # Table Schema
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
-
-    def __repr__(self):
-        return "<Shopcart %r id=[%s]>" % (self.name, self.id)
+class PersistentBase:
+    """Base class added persistent methods"""
 
     def create(self):
         """
         Creates a Shopcart to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating %s", self.customer_id)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
@@ -45,38 +34,8 @@ class Shopcart(db.Model):
         """
         Updates a Shopcart to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Updating %s", self.id)
         db.session.commit()
-
-    def delete(self):
-        """Removes a Shopcart from the data store"""
-        logger.info("Deleting %s", self.name)
-        db.session.delete(self)
-        db.session.commit()
-
-    def serialize(self):
-        """Serializes a Shopcart into a dictionary"""
-        return {"id": self.id, "name": self.name}
-
-    def deserialize(self, data):
-        """
-        Deserializes a Shopcart from a dictionary
-
-        Args:
-            data (dict): A dictionary containing the resource data
-        """
-        try:
-            self.name = data["name"]
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid Shopcart: missing " + error.args[0]
-            )
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid Shopcart: body of request contained bad or no data - "
-                "Error message: " + error
-            )
-        return self
 
     @classmethod
     def init_db(cls, app):
@@ -90,22 +49,142 @@ class Shopcart(db.Model):
 
     @classmethod
     def all(cls):
-        """Returns all of the Shopcarts in the database"""
-        logger.info("Processing all Shopcarts")
+        """Returns all of the records in the database"""
+        logger.info("Processing all records")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """Finds a Shopcart by it's ID"""
+        """Finds a record by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
-    @classmethod
-    def find_by_name(cls, name):
-        """Returns all Shopcarts with the given name
+    def delete(self):
+        """Removes a Shopcart from the data store"""
+        logger.info("Deleting %s", self.id)
+        db.session.delete(self)
+        db.session.commit()
 
-        Args:
-            name (string): the name of the Shopcarts you want to match
+
+######################################################################
+#  P R O D U C T   M O D E L
+######################################################################
+class Product(db.Model, PersistentBase):
+    """
+    Class that represents an Product
+    """
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(260), nullable=False)  # e.g., work, home, vacation, etc.
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
+
+    def __repr__(self):
+        return "<Product %r id=[%s] shopcart[%s]>" % (
+            self.name,
+            self.id,
+            self.shopcart_id,
+        )
+
+    def __str__(self):
+        return "%s: %s, %s" % (
+            self.name,
+            self.quantity,
+            self.price,
+        )
+
+    def serialize(self):
+        """Serializes a Product into a dictionary"""
+        return {
+            "id": self.id,
+            "shopcart_id": self.shopcart_id,
+            "name": self.name,
+            "price": self.price,
+            "quantity": self.quantity,
+        }
+
+    def deserialize(self, data: dict):
         """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
+        Deserializes a Product from a dictionary
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.shopcart_id = data["shopcart_id"]
+            self.name = data["name"]
+            self.price = data["price"]
+            self.quantity = data["quantity"]
+            self.id = data["id"]
+        except KeyError as error:
+            raise DataValidationError("Invalid Product: missing " + error.args[0])
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Product: body of request contained "
+                "bad or no data " + error.args[0]
+            )
+        return self
+
+
+######################################################################
+#  S H O P C A R T   M O D E L
+######################################################################
+class Shopcart(db.Model, PersistentBase):
+    """
+    Class that represents an Shopcart
+    """
+
+    app = None
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, nullable=False)
+    products = db.relationship("Product", backref="shopcart", lazy=True)
+
+    def __repr__(self):
+        return "<Shopcart %r id=[%s]>" % (self.id, self.customer_id)
+
+    def serialize(self):
+        """Serializes a Shopcart into a dictionary"""
+        shopcart = {
+            "id": self.id,
+            "customer_id": self.customer_id,
+            "products": [],
+        }
+        for product in self.products:
+            shopcart["products"].append(product.serialize())
+        return shopcart
+
+    def deserialize(self, data):
+        """
+        Deserializes a Shopcart from a dictionary
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.id = data["id"]
+            self.customer_id = data["customer_id"]
+            # handle inner list of products
+            product_list = data.get("products")
+            for json_product in product_list:
+                product = Product()
+                product.deserialize(json_product)
+                self.products.append(product)
+        except KeyError as error:
+            raise DataValidationError("Invalid Shopcart: missing " + error.args[0])
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Shopcart: body of request contained "
+                "bad or no data - " + error.args[0]
+            )
+        return self
+
+    @classmethod
+    def find_by_id(cls, id):
+        """Returns the Shopcart with the given customer id
+        Args:
+            id (string): the id of the customer you want to match
+        """
+        logger.info("Processing id query for %s ...", id)
+        return cls.query.filter(cls.customer_id == id)
