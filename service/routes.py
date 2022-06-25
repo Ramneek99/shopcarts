@@ -4,7 +4,9 @@ My Service
 Describe what your service does here
 """
 
-# from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, abort, make_response
+
+# , Flask
 from .utils import status  # HTTP Status Codes
 from service.models import Shopcart
 
@@ -19,9 +21,33 @@ from . import app
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Shop Cart REST API Service",
+            version="1.0",
+            paths=url_for("create_shopcarts", _external=True),
+        ),
         status.HTTP_200_OK,
     )
+
+
+######################################################################
+# RETRIEVE AN ACCOUNT
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def get_shopcarts(shopcart_id):
+    """
+    Retrieve a shopcart of a customer
+    This endpoint will return a shopcart based on it's id
+    """
+    app.logger.info("Request for Shopcart with id: %s", shopcart_id)
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -31,18 +57,18 @@ def index():
 def create_shopcarts():
     """
     Creates a Shopcart
-    This endpoint will create a Shopcart based the data in the body that is posted
+    This endpoint will create a Shop Cart based the data in the body that is posted
     """
-    app.logger.info("Request to create a shopcart")
+    app.logger.info("Request to create a Shop Cart")
     check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
     shopcart.create()
     message = shopcart.serialize()
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-
-    app.logger.info("Shopcart with ID [%s] created.", shopcart.id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
 
 ######################################################################
