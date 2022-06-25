@@ -34,13 +34,7 @@ class PersistentBase:
         """
         Updates a Shopcart to the database
         """
-        logger.info("Updating %s", self.customer_id)
-        db.session.commit()
-
-    def delete(self):
-        """Removes a Shopcart from the data store"""
-        logger.info("Deleting %s", self.customer_id)
-        db.session.delete(self)
+        logger.info("Updating %s", self.id)
         db.session.commit()
 
     @classmethod
@@ -64,6 +58,12 @@ class PersistentBase:
         """Finds a record by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
+
+    def delete(self):
+        """Removes a Shopcart from the data store"""
+        logger.info("Deleting %s", self.id)
+        db.session.delete(self)
+        db.session.commit()
 
 
 ######################################################################
@@ -105,7 +105,7 @@ class Product(db.Model, PersistentBase):
             "quantity": self.quantity,
         }
 
-    def deserialize(self, data):
+    def deserialize(self, data: dict):
         """
         Deserializes a Product from a dictionary
         Args:
@@ -149,7 +149,7 @@ class Shopcart(db.Model, PersistentBase):
         """Serializes a Shopcart into a dictionary"""
         shopcart = {
             "id": self.id,
-            "customer id": self.customer_id,
+            "customer_id": self.customer_id,
             "products": [],
         }
         for product in self.products:
