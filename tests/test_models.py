@@ -10,7 +10,7 @@ import unittest
 # from service.models import DataValidationError
 from service.models import Shopcart, db
 from service import app
-from tests.factories import ShopcartFactory
+from tests.factories import ShopCartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -51,7 +51,7 @@ class TestShopCart(unittest.TestCase):
     ######################################################################
     def test_create_a_shopcart(self):
         """It should Create an Shopcart and assert that it exists"""
-        fake_shopcart = ShopcartFactory()
+        fake_shopcart = ShopCartFactory()
         shopcart = Shopcart(
             customer_id=fake_shopcart.customer_id,
         )
