@@ -79,7 +79,7 @@ class Product(db.Model, PersistentBase):
     name = db.Column(db.String(260), nullable=False)  # e.g., work, home, vacation, etc.
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart_id"), nullable=False)
+    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
 
     def __repr__(self):
         return "<Product %r id=[%s] shopcart[%s]>" % (
