@@ -5,24 +5,23 @@ Test cases for YourResourceModel Model
 import logging
 import os
 import unittest
-from datetime import date
-from sqlalchemy import null
-from werkzeug.exceptions import NotFound
-from service.models import DataValidationError, ShopCart, db
+# from sqlalchemy import null
+# from werkzeug.exceptions import NotFound
+# from service.models import DataValidationError
+from service.models import Shopcart, db
 from service import app
-from tests.factories import ShopCartFactory 
+from tests.factories import ShopcartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 
-######################################################################
-#  <your resource name>   M O D E L   T E S T   C A S E S
-######################################################################
 
-
-class TestYourResourceModel(unittest.TestCase):
-    """Test Cases for YourResourceModel Model"""
+######################################################################
+#  S H O P C A R T   M O D E L   T E S T   C A S E S
+######################################################################
+class TestShopCart(unittest.TestCase):
+    """Test Cases for ShopCart Model"""
 
     @classmethod
     def setUpClass(cls):
@@ -31,16 +30,16 @@ class TestYourResourceModel(unittest.TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        ShopCart.init_db(app)
+        Shopcart.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
         """This runs once after the entire test suite"""
-        db.session.close()
+        pass
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(ShopCart).delete()  # clean up the last tests
+        db.session.query(Shopcart).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -50,7 +49,43 @@ class TestYourResourceModel(unittest.TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
-    def test_createShopCart(self):
+    def test_create_a_shopcart(self):
+        """It should Create an Shopcart and assert that it exists"""
+        fake_shopcart = ShopcartFactory()
+        shopcart = Shopcart(
+            customer_id=fake_shopcart.customer_id,
+        )
+        self.assertIsNotNone(shopcart)
+        self.assertEqual(shopcart.id, None)
+
+    ''' def test_create_a_shopcart(self):
+        """It should Create a pet and assert that it exists"""
+        pet = ShopCart(customer_id=0, product_id=2, product_name="apple", price=3.99)
+        self.assertEqual(str(pet), "customer_id: 0, items: apple")
+        self.assertTrue(pet is not None)
+        self.assertEqual(pet.id, None)
+        self.assertEqual(pet.name, "Fido")
+        self.assertEqual(pet.category, "dog")
+        self.assertEqual(pet.available, True)
+        self.assertEqual(pet.gender, Gender.MALE)
+        pet = Pet(name="Fido", category="dog", available=False, gender=Gender.FEMALE)
+        self.assertEqual(pet.available, False)
+        self.assertEqual(pet.gender, Gender.FEMALE)
+
+    def test_add_a_pet(self):
+        """It should Create a pet and add it to the database"""
+        pets = Pet.all()
+        self.assertEqual(pets, [])
+        pet = Pet(name="Fido", category="dog", available=True, gender=Gender.MALE)
+        self.assertTrue(pet is not None)
+        self.assertEqual(pet.id, None)
+        pet.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(pet.id)
+        pets = Pet.all()
+        self.assertEqual(len(pets), 1)'''
+
+    '''def test_createShopCart(self):
         """This test will test the function to create a shopCart"""
         shopCart = ShopCartFactory()
         ShopCart.create(
@@ -66,11 +101,9 @@ class TestYourResourceModel(unittest.TestCase):
         self.assertTrue(shopCartFound.product_id==shopCart.product_id)
         self.assertTrue(shopCartFound.product_name==shopCart.product_name)
         self.assertTrue(shopCartFound.quantity==shopCart.quantity)
-        self.assertTrue(shopCartFound.price==shopCart.price)
-
-
+        self.assertTrue(shopCartFound.price==shopCart.price)'''
 
     def test_XXXX(self):
         """It should always be true"""
-        
+
         self.assertTrue(True)
