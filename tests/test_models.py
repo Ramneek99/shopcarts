@@ -269,3 +269,4 @@ class TestShopCart(unittest.TestCase):
         found_shopCart = Shopcart.find(shopcart.id)
         '''There should be one product left'''
         self.assertEqual(len(found_shopCart.products), 1)
+        self.assertEqual(found_shopCart.products[0], product2)

@@ -13,12 +13,13 @@ from unittest import TestCase
 from service import app
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
-from tests.factories import ShopCartFactory
+from tests.factories import ShopCartFactory, ProductFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/shopcarts"
+PRODUCT_URL = "/product"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -129,3 +130,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
+    
+
+
+
