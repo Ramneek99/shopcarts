@@ -244,3 +244,28 @@ class TestShopCart(unittest.TestCase):
         # Fetch it back again
         shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(shopcart.products), 0)
+
+    
+    def test_delete_shopcart_product_by_id(self):
+        '''It should delete product by customer id and product id 
+        no matter what the quantity of the product is'''
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+        '''Create two products'''
+        product = ProductFactory()
+        product2 = ProductFactory()
+        shopcart = ShopCartFactory()
+        shopcart.create()
+        shopcart.products.append(product)
+        shopcart.products.append(product2)
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(shopcart.id)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+        deletedQuantity = Shopcart.delete_item(shopcart.customer_id, product.id)
+        self.assertEqual(deletedQuantity, product.quantity)
+        found_product = Product.find(product.id)
+        self.assertIsNone(found_product)
+        found_shopCart = Shopcart.find(shopcart.id)
+        '''There should be one product left'''
+        self.assertEqual(len(found_shopCart.products), 1)
