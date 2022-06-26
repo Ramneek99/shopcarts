@@ -15,7 +15,8 @@ install: ## Install dependencies
 
 test: ## Run the unit tests
 	$(info Running tests...)
-	nosetests --with-spec --spec-color
+	nosetests
+	# nosetests --with-spec --spec-color
 
 run: ## Run the service
 	$(info Starting service...)
