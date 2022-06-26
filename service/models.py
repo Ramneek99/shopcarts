@@ -188,7 +188,7 @@ class Shopcart(db.Model, PersistentBase):
     def find_by_id(cls, id):
         """Returns the Shopcart with the given customer id
         Args:
-            id (string): the id of the customer you want to match
+            id (Integer): the id of the customer you want to match
         """
         logger.info("Processing id query for %s ...", id)
         return cls.query.filter(cls.customer_id == id)
@@ -210,4 +210,12 @@ class Shopcart(db.Model, PersistentBase):
                 product.delete()
                 deletedCnt += productQuantity
         return deletedCnt
+
+    @classmethod
+    def add_item(cls, customer_id, product):
+        """
+        Args:
+            customer_id (String): the customer id to whose shopcart we will add a new product 
+            product (): the  
+        """
 

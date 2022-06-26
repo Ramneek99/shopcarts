@@ -8,7 +8,7 @@ from flask import jsonify, request, url_for, abort, make_response
 
 # , Flask
 from .utils import status  # HTTP Status Codes
-from service.models import Shopcart
+from service.models import Shopcart, Product
 
 # Import Flask application
 from . import app
@@ -70,6 +70,20 @@ def create_shopcarts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# ADD A NEW PRODUCT
+######################################################################
+@app.route("/product", methods=["POST"])
+def add_product():
+    """
+    Add a Product to a existed Shopcart
+    This endpoint will add a product to a given shopcart based on the posted data in the body
+    """
+    app.logger.info("Request to add a Product to a Shop Cart")
+    check_content_type("application/json")
+    product = Product()
+    product.deserialize(request.get_json())
+    product.create()
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
