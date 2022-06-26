@@ -215,7 +215,10 @@ class Shopcart(db.Model, PersistentBase):
     def add_item(cls, customer_id, product):
         """
         Args:
-            customer_id (String): the customer id to whose shopcart we will add a new product 
-            product (): the  
+            customer_id (Integer): the customer id to whose shopcart we will add a new product 
+            product (Product): the product we want to add to the shopcart 
         """
+        shopCart = cls.find_by_id(customer_id)
+        shopCart.products.append(product)
+        shopCart.update()
 
