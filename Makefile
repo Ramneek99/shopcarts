@@ -15,6 +15,7 @@ install: ## Install dependencies
 
 test: ## Run the unit tests
 	$(info Running tests...)
+	flask create-db
 	nosetests
 	# nosetests --with-spec --spec-color
 
