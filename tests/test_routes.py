@@ -146,7 +146,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
 
     def test_404_not_found_error(self):
-        "It should return 404 not found error"
+        "It should raise 404 not found error"
         shopcart = ShopCartFactory()
         wrong_url = "shopcarT"
         resp = self.client.post(
@@ -155,6 +155,15 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_405_method_not_allowed(self):
-        """It should return 405 method not allowed"""
+        """It should raise 405 method not allowed error"""
         resp = self.client.post(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_415_media_not_supported(self):
+        """It should raise 415 method not supported error"""
+        text = "Hello World"
+        resp = self.client.post(
+            BASE_URL, data=text, content_type="text/plain"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
