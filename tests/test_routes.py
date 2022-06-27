@@ -131,7 +131,7 @@ class TestShopcartService(TestCase):
         )
 
     def test_create_duplicate_shopcart(self):
-        '''It shouldn't Create duplicate shopcarts'''
+        """It shouldn't Create duplicate shopcarts"""
         shopcart = ShopCartFactory()
         resp = self.client.post(
             BASE_URL, json=shopcart.serialize(), content_type="application/json"
@@ -150,14 +150,21 @@ class TestShopcartService(TestCase):
         new_shopcart = Shopcart()
         new_shopcart.deserialize(resp.get_json())
         logging.info("The new shopcart is: %s", resp.get_json())
-        self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
+        self.assertEqual(
+            new_shopcart.products[0].serialize(),
+            product.serialize(),
+            "Product does not match",
+        )
         logging.info("The shopcart in response: %s", resp.get_json())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         resp = self.client.post(
             BASE_URL, json=shopcart.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
-        self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
+        self.assertEqual(
+            resp.get_json()["message"],
+            f"409 Conflict: Shopcart {shopcart.customer_id} already exists",
+        )
 
     def test_404_not_found_error(self):
         "It should raise 404 not found error"
@@ -176,9 +183,7 @@ class TestShopcartService(TestCase):
     def test_415_media_not_supported(self):
         """It should raise 415 media not supported error"""
         text = "Hello World"
-        resp = self.client.post(
-            BASE_URL, data=text, content_type="text/plain"
-        )
+        resp = self.client.post(BASE_URL, data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_500_internal_server_error(self):
@@ -187,7 +192,7 @@ class TestShopcartService(TestCase):
             "/test_internal_server_error", data=text, content_type="text/plain"
         )
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
     def test_add_product(self):
         """It should Create a new product and add it to shopcart"""
         shopcart = ShopCartFactory()
@@ -208,8 +213,12 @@ class TestShopcartService(TestCase):
         new_shopcart = Shopcart()
         new_shopcart.deserialize(resp.get_json())
         logging.info("The new shopcart is: %s", resp.get_json())
-        self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
-        
+        self.assertEqual(
+            new_shopcart.products[0].serialize(),
+            product.serialize(),
+            "Product does not match",
+        )
+
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
         self._create_shopcarts(5)
