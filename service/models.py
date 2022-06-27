@@ -185,7 +185,7 @@ class Shopcart(db.Model, PersistentBase):
     def find_by_customer_id(cls, customer_id):
         """Returns the Shopcart with the given customer id
         Args:
-            id (Integer): the id of the customer you want to match
+            customer_id (Integer): the id of the customer you want to match
         """
         logger.info("Processing id query for %s ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id).first()
@@ -195,8 +195,8 @@ class Shopcart(db.Model, PersistentBase):
         """
         Returns the quantity of deleted products with the given customer id and product id
         Args:
-            customer_id(Integer): the id of the customer you want to match
-            product_id(Integer): the id of the product you want to match
+            customer_id(string): the id of the customer you want to match
+            product_id(string): the id of the product you want to match
         """
         shopCart = cls.find_by_customer_id(customer_id)
         productArr = shopCart.products
@@ -207,3 +207,17 @@ class Shopcart(db.Model, PersistentBase):
                 product.delete()
                 deletedCnt += productQuantity
         return deletedCnt
+
+    @classmethod
+    def add_product(cls, product):
+        """
+        Args:
+            product (Product): the product we want to add to the shopcart
+        """
+        logging.info("Add Product: %s", product.serialize())
+        shopCart = cls.find(product.shopcart_id)
+        logging.info("The shopCart is: %s", shopCart.serialize())
+        shopCart.products.append(product)
+        logging.info("Add Product after: %s", product.serialize())
+        logging.info("Updated: %s", shopCart.serialize())
+        shopCart.update()

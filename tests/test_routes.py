@@ -13,7 +13,7 @@ from unittest import TestCase
 from service import app
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
-from tests.factories import ShopCartFactory
+from tests.factories import ShopCartFactory, ProductFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -106,7 +106,6 @@ class TestShopcartService(TestCase):
             BASE_URL, json=shopcart.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
@@ -137,6 +136,21 @@ class TestShopcartService(TestCase):
         resp = self.client.post(
             BASE_URL, json=shopcart.serialize(), content_type="application/json"
         )
+        shopcart = Shopcart()
+        shopcart.deserialize(resp.get_json())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        logging.info("The new product is: %s" % product.serialize())
+        logging.info("The new shopcart is: %s" % shopcart.serialize())
+        resp = self.client.post(
+            PRODUCT_URL, json=product.serialize(), content_type="application/json"
+        )
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        new_shopcart = Shopcart()
+        new_shopcart.deserialize(resp.get_json())
+        logging.info("The new shopcart is: %s", resp.get_json())
+        self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
         logging.info("The shopcart in response: %s", resp.get_json())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         resp = self.client.post(

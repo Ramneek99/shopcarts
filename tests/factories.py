@@ -16,7 +16,6 @@
 Test Factory to make fake objects for testing
 """
 import factory
-import random
 from factory.fuzzy import FuzzyChoice
 from service.models import Product, Shopcart
 
@@ -39,16 +38,8 @@ class ShopCartFactory(factory.Factory):
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
-
         model = Shopcart
-
-    # MIN_PRICE = 10.0
-    # MAX_PRICE = 1000.0
 
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
-    products = factory.RelatedFactoryList(
-        ProductFactory,
-        factory_related_name="shopcart_id",
-        size=lambda: random.randint(1, 5),
-    )
+    products = []

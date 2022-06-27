@@ -172,34 +172,38 @@ class TestShopCart(unittest.TestCase):
         shopcart.create()
         logging.debug("Created: %s", shopcart.serialize())
         product = ProductFactory()
-        shopcart.products.append(product)
-        shopcart.update()
+        product.shopcart_id = shopcart.id
+        Shopcart.add_product(product)
         logging.debug("Updated: %s", shopcart.serialize())
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
 
-        new_shopcart = Shopcart.find(shopcart.id)
+        new_shopcart = Shopcart.find(product.shopcart_id)
         self.assertEqual(new_shopcart.products[0].name, product.name)
 
         product2 = ProductFactory()
-        shopcart.products.append(product2)
-        shopcart.update()
-
-        new_shopcart = Shopcart.find(shopcart.id)
+        product2.shopcart_id = new_shopcart.id
+        logging.info("Shopcart id: %d", new_shopcart.customer_id)
+        Shopcart.add_product(product2)
+        logging.debug("Created: %s", product2.serialize())
+        new_shopcart = Shopcart.find(product2.shopcart_id)
         self.assertEqual(len(new_shopcart.products), 2)
-        self.assertEqual(shopcart.products[1].name, product2.name)
+        self.assertEqual(new_shopcart.products[1].name, product2.name)
+        self.assertEqual(new_shopcart.id, new_shopcart.products[1].shopcart_id)
 
     def test_update_shopcart_product(self):
         """It should Update a shopcart's products"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 
-        product = ProductFactory()
         shopcart = ShopCartFactory()
         shopcart.create()
-        shopcart.products.append(product)
+        # logging.debug("Created: %s", shopcart.serialize())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        Shopcart.add_product(product)
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
