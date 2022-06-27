@@ -83,7 +83,7 @@ class TestShopcartService(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_get_account(self):
+    def test_get_shopcart(self):
         """It should Read a single Shopcart"""
         # get the id of an account
         shopcart = self._create_shopcarts(1)[0]
@@ -94,8 +94,8 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["customer_id"], shopcart.customer_id)
 
-    def test_get_account_not_found(self):
-        """It should not Read an Account that is not found"""
+    def test_get_shopcart_not_found(self):
+        """It should not Read a shopcart that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -187,7 +187,29 @@ class TestShopcartService(TestCase):
             "/test_internal_server_error", data=text, content_type="text/plain"
         )
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
+    def test_add_product(self):
+        """It should Create a new product and add it to shopcart"""
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        shopcart = Shopcart()
+        shopcart.deserialize(resp.get_json())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        logging.info("The new product is: %s" % product.serialize())
+        logging.info("The new shopcart is: %s" % shopcart.serialize())
+        resp = self.client.post(
+            PRODUCT_URL, json=product.serialize(), content_type="application/json"
+        )
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        new_shopcart = Shopcart()
+        new_shopcart.deserialize(resp.get_json())
+        logging.info("The new shopcart is: %s", resp.get_json())
+        self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
+        
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
         self._create_shopcarts(5)
