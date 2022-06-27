@@ -13,6 +13,8 @@ from service.models import Shopcart, Product
 # Import Flask application
 from . import app
 
+import logging
+
 
 ######################################################################
 # GET INDEX
@@ -31,6 +33,16 @@ def index():
 
 
 ######################################################################
+# TEST INTERVAL SERVER ERROR
+######################################################################
+@app.route("/test_internal_server_error", methods=["POST"])
+def test_internal_server_error():
+    """Route for testing internal server error"""
+    abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Test for internal server error")
+
+
+######################################################################
+# RETRIEVE AN ACCOUNT
 # RETRIEVE A SHOP CART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
@@ -43,7 +55,7 @@ def get_shopcarts(shopcart_id):
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
-            status.HTTP_404_NOT_FOUND,
+            status.HTTP_400_BAD_REQUEST,
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
 
@@ -63,8 +75,13 @@ def create_shopcarts():
     check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
+    found_shop_cart = Shopcart.find_by_customer_id(shopcart.customer_id)
+    logging.info("To create shopcart with customer_id: %d", shopcart.customer_id)
+    if found_shop_cart is not None:
+        logging.info("Found shopcart: %s", type(found_shop_cart))
+        abort(status.HTTP_409_CONFLICT, f"Shopcart {shopcart.customer_id} already exists")
     shopcart.create()
-    message = shopcart.serialize()
+    message = Shopcart.find(shopcart.id).serialize()
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -101,11 +118,13 @@ def list_shopcarts():
     """Returns all of the Shopcarts"""
     app.logger.info("Request for Shop Cart list")
     customer_id = request.args.get("customer_id")
+    results = []
     if customer_id:
         shopcarts = Shopcart.find_by_customer_id(customer_id)
+        results = [shopcarts.serialize()]
     else:
         shopcarts = Shopcart.all()
-    results = [shopcart.serialize() for shopcart in shopcarts]
+        results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
