@@ -130,3 +130,18 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
+
+    def test_create_duplicate_shopcart(self):
+        '''It shouldn't Create duplicate shopcarts'''
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        logging.info("The shopcart in response: %s", resp.get_json())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
+

@@ -13,6 +13,7 @@ from service.models import Shopcart
 # Import Flask application
 from . import app
 
+import logging
 
 ######################################################################
 # GET INDEX
@@ -63,8 +64,13 @@ def create_shopcarts():
     check_content_type("application/json")
     shopcart = Shopcart()
     shopcart.deserialize(request.get_json())
+    found_shop_cart = Shopcart.find_by_customer_id(shopcart.customer_id)
+    logging.info("To create shopcart with customer_id: %d", shopcart.customer_id)
+    if found_shop_cart is not None:
+        logging.info("Found shopcart: %s", type(found_shop_cart))
+        abort(status.HTTP_409_CONFLICT, f"Shopcart {shopcart.customer_id} already exists")
     shopcart.create()
-    message = shopcart.serialize()
+    message = Shopcart.find(shopcart.id).serialize()
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
