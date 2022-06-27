@@ -62,8 +62,9 @@ class PersistentBase:
     def delete(self):
         """Removes a Shopcart from the data store"""
         logger.info("Deleting %s", self.id)
-        db.session.delete(self)
+        deletedCnt = db.session.delete(self)
         db.session.commit()
+        return deletedCnt
 
 
 ######################################################################
@@ -181,10 +182,28 @@ class Shopcart(db.Model, PersistentBase):
         return self
 
     @classmethod
-    def find_by_id(cls, id):
+    def find_by_customer_id(cls, customer_id):
         """Returns the Shopcart with the given customer id
         Args:
-            id (string): the id of the customer you want to match
+            id (Integer): the id of the customer you want to match
         """
-        logger.info("Processing id query for %s ...", id)
-        return cls.query.filter(cls.customer_id == id)
+        logger.info("Processing id query for %s ...", customer_id)
+        return cls.query.filter(cls.customer_id == customer_id).first()
+
+    @classmethod
+    def delete_item(cls, customer_id, product_id):
+        """
+        Returns the quantity of deleted products with the given customer id and product id
+        Args:
+            customer_id(Integer): the id of the customer you want to match
+            product_id(Integer): the id of the product you want to match
+        """
+        shopCart = cls.find_by_customer_id(customer_id)
+        productArr = shopCart.products
+        deletedCnt = 0
+        for product in productArr:
+            if product.id == product_id:
+                productQuantity = product.quantity
+                product.delete()
+                deletedCnt += productQuantity
+        return deletedCnt
