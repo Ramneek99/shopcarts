@@ -97,7 +97,7 @@ class TestShopcartService(TestCase):
     def test_get_account_not_found(self):
         """It should not Read an Account that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
@@ -130,6 +130,49 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
+
+    def test_create_duplicate_shopcart(self):
+        '''It shouldn't Create duplicate shopcarts'''
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        logging.info("The shopcart in response: %s", resp.get_json())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
+
+    def test_404_not_found_error(self):
+        "It should raise 404 not found error"
+        shopcart = ShopCartFactory()
+        wrong_url = "shopcarT"
+        resp = self.client.post(
+            wrong_url, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_405_method_not_allowed(self):
+        """It should raise 405 method not allowed error"""
+        resp = self.client.post(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_415_media_not_supported(self):
+        """It should raise 415 media not supported error"""
+        text = "Hello World"
+        resp = self.client.post(
+            BASE_URL, data=text, content_type="text/plain"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_500_internal_server_error(self):
+        text = "Hello World"
+        resp = self.client.post(
+            "/test_internal_server_error", data=text, content_type="text/plain"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
