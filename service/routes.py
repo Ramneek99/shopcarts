@@ -24,14 +24,14 @@ def index():
         jsonify(
             name="Shop Cart REST API Service",
             version="1.0",
-            paths=url_for("create_shopcarts", _external=True),
+            paths=url_for("list_shopcarts", _external=True),
         ),
         status.HTTP_200_OK,
     )
 
 
 ######################################################################
-# RETRIEVE AN ACCOUNT
+# RETRIEVE A SHOP CART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
@@ -51,7 +51,7 @@ def get_shopcarts(shopcart_id):
 
 
 ######################################################################
-# CREATE A NEW SHOPCART
+# CREATE A NEW SHOP CART
 ######################################################################
 @app.route("/shopcarts", methods=["POST"])
 def create_shopcarts():
@@ -69,6 +69,22 @@ def create_shopcarts():
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
+
+
+######################################################################
+# LIST ALL SHOP CARTS
+######################################################################
+@app.route("/shopcarts", methods=["GET"])
+def list_shopcarts():
+    """Returns all of the Shopcarts"""
+    app.logger.info("Request for Shop Cart list")
+    customer_id = request.args.get("customer_id")
+    if customer_id:
+        shopcarts = Shopcart.find_by_id(customer_id)
+    else:
+        shopcarts = Shopcart.all()
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
