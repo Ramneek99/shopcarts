@@ -154,10 +154,3 @@ class TestShopcartService(TestCase):
         new_shopcart.deserialize(resp.get_json())
         logging.info("The new shopcart is: %s", resp.get_json())
         self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
-
-
-
-    
-
-
-

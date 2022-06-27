@@ -16,7 +16,6 @@
 Test Factory to make fake objects for testing
 """
 import factory
-import random
 from factory.fuzzy import FuzzyChoice
 from service.models import Product, Shopcart
 
@@ -33,6 +32,7 @@ class ProductFactory(factory.Factory):
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
     price = FuzzyChoice(choices=[0.99, 1.99, 2.99, 3.99, 4.99])
 
+
 class ShopCartFactory(factory.Factory):
     """Creates fake shopCarts"""
 
@@ -40,10 +40,7 @@ class ShopCartFactory(factory.Factory):
         """Maps factory to data model"""
 
         model = Shopcart
-
-    # MIN_PRICE = 10.0
-    # MAX_PRICE = 1000.0
-
+        
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
     products = []

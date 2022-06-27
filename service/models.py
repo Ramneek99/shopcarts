@@ -127,9 +127,6 @@ class Product(db.Model, PersistentBase):
             )
         return self
 
-    
-
-
 
 ######################################################################
 #  S H O P C A R T   M O D E L
@@ -217,11 +214,10 @@ class Shopcart(db.Model, PersistentBase):
         Args:
             product (Product): the product we want to add to the shopcart 
         """
-        logging.info("Add Product: %s" % product.serialize())
+        logging.info("Add Product: %s", product.serialize())
         shopCart = cls.find(product.shopcart_id)
-        logging.info("The shopCart is: %s" % shopCart.serialize())
+        logging.info("The shopCart is: %s", shopCart.serialize())
         shopCart.products.append(product)
-        logging.info("Add Product after: %s" % product.serialize())
-        logging.info("Updated: %s" % shopCart.serialize())
+        logging.info("Add Product after: %s", product.serialize())
+        logging.info("Updated: %s", shopCart.serialize())
         shopCart.update()
-
