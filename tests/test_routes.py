@@ -129,7 +129,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
- 
+
     def test_add_product(self):
         """It should Create a new product"""
         shopcart = ShopCartFactory()
