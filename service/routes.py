@@ -80,7 +80,7 @@ def list_shopcarts():
     app.logger.info("Request for Shop Cart list")
     customer_id = request.args.get("customer_id")
     if customer_id:
-        shopcarts = Shopcart.find_by_id(customer_id)
+        shopcarts = Shopcart.find_by_customer_id(customer_id)
     else:
         shopcarts = Shopcart.all()
     results = [shopcart.serialize() for shopcart in shopcarts]
