@@ -145,7 +145,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
 
-    def test_not_found_error(self):
+    def test_404_not_found_error(self):
         "It should return 404 not found error"
         shopcart = ShopCartFactory()
         wrong_url = "shopcarT"
@@ -153,3 +153,8 @@ class TestShopcartService(TestCase):
             wrong_url, json=shopcart.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_405_method_not_allowed(self):
+        """It should return 405 method not allowed"""
+        resp = self.client.post(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
