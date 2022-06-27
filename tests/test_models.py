@@ -173,7 +173,7 @@ class TestShopCart(unittest.TestCase):
         logging.debug("Created: %s", shopcart.serialize())
         product = ProductFactory()
         product.shopcart_id = shopcart.id
-        Shopcart.add_product(shopcart.customer_id, product)
+        Shopcart.add_product(product)
         logging.debug("Updated: %s", shopcart.serialize())
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
@@ -186,7 +186,7 @@ class TestShopCart(unittest.TestCase):
         product2 = ProductFactory()
         product2.shopcart_id = new_shopcart.id
         logging.info("Shopcart id: %d", new_shopcart.customer_id)
-        Shopcart.add_product(shopcart.customer_id, product2)
+        Shopcart.add_product(product2)
         logging.debug("Created: %s", product2.serialize())
         new_shopcart = Shopcart.find(product2.shopcart_id)
         self.assertEqual(len(new_shopcart.products), 2)
@@ -198,12 +198,12 @@ class TestShopCart(unittest.TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 
-        product = ProductFactory()
         shopcart = ShopCartFactory()
-        product.shopcart_id = shopcart.customer_id
-        logging.info("Shopcart id of the product is: %d\n Shopcart id is: %d" % (product.id, shopcart.id))
         shopcart.create()
-        Shopcart.add_product(shopcart.customer_id, product)
+        # logging.debug("Created: %s", shopcart.serialize())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        Shopcart.add_product(product)
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()

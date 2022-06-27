@@ -212,13 +212,14 @@ class Shopcart(db.Model, PersistentBase):
         return deletedCnt
 
     @classmethod
-    def add_product(cls, id, product):
+    def add_product(cls, product):
         """
         Args:
             product (Product): the product we want to add to the shopcart 
         """
         logging.info("Add Product: %s" % product.serialize())
-        shopCart = cls.find_by_customer_id(id)[0]
+        shopCart = cls.find(product.shopcart_id)
+        logging.info("The shopCart is: %s" % shopCart.serialize())
         shopCart.products.append(product)
         logging.info("Add Product after: %s" % product.serialize())
         logging.info("Updated: %s" % shopCart.serialize())
