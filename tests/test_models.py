@@ -180,7 +180,7 @@ class TestShopCart(unittest.TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
 
-        new_shopcart = Shopcart.find(product.shopcart_id) 
+        new_shopcart = Shopcart.find(product.shopcart_id)
         self.assertEqual(new_shopcart.products[0].name, product.name)
 
         product2 = ProductFactory()
@@ -249,9 +249,8 @@ class TestShopCart(unittest.TestCase):
         shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(shopcart.products), 0)
 
-    
     def test_delete_shopcart_product_by_id(self):
-        '''It should delete product by customer id and product id 
+        '''It should delete product by customer id and product id
         no matter what the quantity of the product is'''
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])

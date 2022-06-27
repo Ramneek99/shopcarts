@@ -106,8 +106,6 @@ class TestShopcartService(TestCase):
             BASE_URL, json=shopcart.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        
-
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
@@ -131,7 +129,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
-    
+ 
     def test_add_product(self):
         """It should Create a new product"""
         shopcart = ShopCartFactory()
@@ -140,7 +138,6 @@ class TestShopcartService(TestCase):
         )
         shopcart = Shopcart()
         shopcart.deserialize(resp.get_json())
-
         product = ProductFactory()
         product.shopcart_id = shopcart.id
         logging.info("The new product is: %s" % product.serialize())

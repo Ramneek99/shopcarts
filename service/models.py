@@ -202,7 +202,7 @@ class Shopcart(db.Model, PersistentBase):
         productArr = shopCart.products
         deletedCnt = 0
         for product in productArr:
-            if product.id==product_id:
+            if product.id == product_id:
                 productQuantity = product.quantity
                 product.delete()
                 deletedCnt += productQuantity
@@ -212,7 +212,7 @@ class Shopcart(db.Model, PersistentBase):
     def add_product(cls, product):
         """
         Args:
-            product (Product): the product we want to add to the shopcart 
+            product (Product): the product we want to add to the shopcart
         """
         logging.info("Add Product: %s", product.serialize())
         shopCart = cls.find(product.shopcart_id)

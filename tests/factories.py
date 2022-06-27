@@ -27,7 +27,7 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-    shopcart_id = None 
+    shopcart_id = None
     name = FuzzyChoice(choices=["apple", "peach", "banana", "pear", "cake"])
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
     price = FuzzyChoice(choices=[0.99, 1.99, 2.99, 3.99, 4.99])
@@ -38,9 +38,8 @@ class ShopCartFactory(factory.Factory):
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
-
         model = Shopcart
-        
+
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
     products = []
