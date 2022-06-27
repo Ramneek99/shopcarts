@@ -83,7 +83,14 @@ def add_product():
     check_content_type("application/json")
     product = Product()
     product.deserialize(request.get_json())
-    product.create()
+    Shopcart.add_product(product.shopcart_id, product)
+    shopCart = Shopcart.find(product.shopcart_id)
+    message = shopcart.serialize()
+    location_url = url_for("add_product", shopcart_id=shopcart.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

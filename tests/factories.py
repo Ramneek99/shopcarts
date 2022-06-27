@@ -28,11 +28,10 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-    shopcart_id = None
+    shopcart_id = None 
     name = FuzzyChoice(choices=["apple", "peach", "banana", "pear", "cake"])
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
     price = FuzzyChoice(choices=[0.99, 1.99, 2.99, 3.99, 4.99])
-
 
 class ShopCartFactory(factory.Factory):
     """Creates fake shopCarts"""
@@ -47,8 +46,4 @@ class ShopCartFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
-    products = factory.RelatedFactoryList(
-        ProductFactory,
-        factory_related_name="shopcart_id",
-        size=lambda: random.randint(1, 5),
-    )
+    products = []

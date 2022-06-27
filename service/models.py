@@ -185,13 +185,13 @@ class Shopcart(db.Model, PersistentBase):
         return self
 
     @classmethod
-    def find_by_id(cls, id):
+    def find_by_customer_id(cls, customer_id):
         """Returns the Shopcart with the given customer id
         Args:
-            id (Integer): the id of the customer you want to match
+            customer_id (Integer): the id of the customer you want to match
         """
-        logger.info("Processing id query for %s ...", id)
-        return cls.query.filter(cls.customer_id == id)
+        logger.info("Processing id query for %s ...", customer_id)
+        return cls.query.filter(cls.customer_id == customer_id)
 
     @classmethod
     def delete_item(cls, customer_id, product_id):
@@ -212,13 +212,15 @@ class Shopcart(db.Model, PersistentBase):
         return deletedCnt
 
     @classmethod
-    def add_item(cls, customer_id, product):
+    def add_product(cls, id, product):
         """
         Args:
-            customer_id (Integer): the customer id to whose shopcart we will add a new product 
             product (Product): the product we want to add to the shopcart 
         """
-        shopCart = cls.find_by_id(customer_id)
+        logging.info("Add Product: %s" % product.serialize())
+        shopCart = cls.find_by_customer_id(id)[0]
         shopCart.products.append(product)
+        logging.info("Add Product after: %s" % product.serialize())
+        logging.info("Updated: %s" % shopCart.serialize())
         shopCart.update()
 
