@@ -160,10 +160,16 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_415_media_not_supported(self):
-        """It should raise 415 method not supported error"""
+        """It should raise 415 media not supported error"""
         text = "Hello World"
         resp = self.client.post(
             BASE_URL, data=text, content_type="text/plain"
         )
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_500_internal_server_error(self):
+        text = "Hello World"
+        resp = self.client.post(
+            "/test_internal_server_error", data=text, content_type="text/plain"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

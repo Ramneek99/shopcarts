@@ -30,6 +30,14 @@ def index():
         status.HTTP_200_OK,
     )
 
+######################################################################
+# TEST INTERVAL SERVER ERROR
+######################################################################
+@app.route("/test_internal_server_error", methods=["POST"])
+def test_internal_server_error():
+    """Route for testing internal server error"""
+    abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Test for internal server error")
+
 
 ######################################################################
 # RETRIEVE AN ACCOUNT
