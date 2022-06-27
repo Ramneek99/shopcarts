@@ -173,3 +173,21 @@ class TestShopcartService(TestCase):
             "/test_internal_server_error", data=text, content_type="text/plain"
         )
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def test_get_shopcart_list(self):
+        """It should Get a list of shopcarts"""
+        self._create_shopcarts(5)
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_get_shopcart_by_customer_id(self):
+        """It should Get a shop cart by customer id"""
+        shopcarts = self._create_shopcarts(3)
+        resp = self.client.get(
+            BASE_URL, query_string=f"customer_id={shopcarts[1].customer_id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["customer_id"], shopcarts[1].customer_id)
