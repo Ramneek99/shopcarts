@@ -97,7 +97,7 @@ class TestShopcartService(TestCase):
     def test_get_account_not_found(self):
         """It should not Read an Account that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
@@ -145,3 +145,11 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
         self.assertEqual(resp.get_json()["message"], f"409 Conflict: Shopcart {shopcart.customer_id} already exists")
 
+    def test_not_found_error(self):
+        "It should return 404 not found error"
+        shopcart = ShopCartFactory()
+        wrong_url = "shopcarT"
+        resp = self.client.post(
+            wrong_url, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

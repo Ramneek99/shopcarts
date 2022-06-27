@@ -44,7 +44,7 @@ def get_shopcarts(shopcart_id):
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
-            status.HTTP_404_NOT_FOUND,
+            status.HTTP_400_BAD_REQUEST,
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
 
