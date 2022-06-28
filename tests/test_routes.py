@@ -219,6 +219,36 @@ class TestShopcartService(TestCase):
             "Product does not match",
         )
 
+    def test_change_product_qty(self):
+        """It should Create a new product and add it to shopcart, then change qty"""
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        shopcart = Shopcart()
+        shopcart.deserialize(resp.get_json())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        logging.info("The new product is: %s" % product.serialize())
+        logging.info("The new shopcart is: %s" % shopcart.serialize())
+        resp = self.client.post(
+            PRODUCT_URL, json=product.serialize(), content_type="application/json"
+        )
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        new_shopcart = Shopcart()
+        new_shopcart.deserialize(resp.get_json())
+        logging.info("The new shopcart is: %s", resp.get_json())
+        self.assertEqual(
+            new_shopcart.products[0].serialize(),
+            product.serialize(),
+            "Product does not match",
+        )   
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/{product.id}/{12}", content_type="application/json"
+        )        
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
         self._create_shopcarts(5)

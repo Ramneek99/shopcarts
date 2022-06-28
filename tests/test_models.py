@@ -104,7 +104,7 @@ class TestShopCart(unittest.TestCase):
         for _ in range(5):
             shopcart = ShopCartFactory()
             shopcart.create()
-        # Assert that there are not 5 shopcarts in the database
+        # Assert that there are now 5 shopcarts in the database
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 5)
 
