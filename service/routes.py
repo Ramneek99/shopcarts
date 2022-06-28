@@ -157,6 +157,7 @@ def get_products(shopcart_id):
     """Return all of products of a given shopcart"""
     app.logger.info("Request for reading items of a given shop cart")
     shopcart = Shopcart.find(shopcart_id)
+    # If the shopcart does not exist, return 400 BAD REQUEST ERROR
     if not shopcart:
         abort(
             status.HTTP_400_BAD_REQUEST,
