@@ -109,6 +109,25 @@ def add_product():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# DELETE A PRODUCT FROM A SHOP CART
+######################################################################
+@app.route("/product", methods=["DELETE"])
+def delete_product():
+    """Delete a product from existing shopcart
+    Returns:
+    The shopcart json data after deletion
+    """
+    app.logger.info("Request to delete a Product from a Shop Cart")
+    check_content_type("application/json")
+    product = Product()
+    product.deserialize(request.get_json())
+    shopCart = Shopcart.find(product.shopcart_id)
+    Shopcart.delete_item(shopCart.customer_id, product.id)
+    location_url = url_for("delete_product", shopcart_id=shopCart.id, _external=True)
+    return make_response(
+        "", status.HTTP_204_NO_CONTENT, {"Location": location_url}
+    )
 
 ######################################################################
 # LIST ALL SHOP CARTS
