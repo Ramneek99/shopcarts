@@ -109,6 +109,7 @@ def add_product():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+
 ######################################################################
 # DELETE A PRODUCT FROM A SHOP CART
 ######################################################################
@@ -129,6 +130,7 @@ def delete_product():
         "", status.HTTP_204_NO_CONTENT, {"Location": location_url}
     )
 
+
 ######################################################################
 # LIST ALL SHOP CARTS
 ######################################################################
@@ -145,6 +147,7 @@ def list_shopcarts():
         shopcarts = Shopcart.all()
         results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 # LIST ALL PRODUCTS OF A GIVEN SHOP CART
