@@ -147,6 +147,23 @@ def list_shopcarts():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
+# LIST ALL PRODUCTS OF A GIVEN SHOP CART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/product", methods=["GET"])
+def get_products(shopcart_id):
+    """Return all of products of a given shopcart"""
+    app.logger.info("Request for reading items of a given shop cart")
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+    products = Shopcart.read_items(shopcart.customer_id)
+    message = jsonify([product.serialize() for product in products])
+    return make_response(message, status.HTTP_200_OK)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
