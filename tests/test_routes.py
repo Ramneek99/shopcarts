@@ -182,6 +182,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_500_internal_server_error(self):
+        """It should raise 500 internal server error"""
         text = "Hello World"
         resp = self.client.post(
             "/test_internal_server_error", data=text, content_type="text/plain"
@@ -258,3 +259,35 @@ class TestShopcartService(TestCase):
         found_shop_cart.deserialize(resp.get_json()[0])
         self.assertEqual(len(found_shop_cart.products), 1)
         self.assertEqual(found_shop_cart.products[0].serialize(), product.serialize())
+
+    def test_read_items(self):
+        """It should read all the items from a given shopcart"""
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        shopcart = Shopcart()
+        shopcart.deserialize(resp.get_json())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        resp = self.client.post(
+            PRODUCT_URL, json=product.serialize(), content_type="application/json"
+        )
+        product2 = ProductFactory()
+        product2.shopcart_id = shopcart.id
+        resp = self.client.post(
+            PRODUCT_URL, json=product2.serialize(), content_type="application/json"
+        )
+        logging.info("The url is: %s", f"{BASE_URL}/{shopcart.id}/product")
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/product"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0], product.serialize())
+        self.assertEqual(data[1], product2.serialize())
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id+1}/product"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

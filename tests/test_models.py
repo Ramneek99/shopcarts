@@ -273,3 +273,17 @@ class TestShopCart(unittest.TestCase):
         '''There should be one product left'''
         self.assertEqual(len(found_shopCart.products), 1)
         self.assertEqual(found_shopCart.products[0], product2)
+
+    def test_read_items(self):
+        """It should read items from the existed shopcart"""
+        product = ProductFactory()
+        product2 = ProductFactory()
+        shopcart = ShopCartFactory()
+        product.shopcart_id = shopcart.id
+        product2.shopcart_id = shopcart.id
+        shopcart.create()
+        Shopcart.add_product(product)
+        Shopcart.add_product(product2)
+        products = Shopcart.read_items(shopcart.customer_id)
+        self.assertEqual(products[0].serialize(), product.serialize())
+        self.assertEqual(products[1].serialize(), product2.serialize())

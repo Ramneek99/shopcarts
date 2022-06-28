@@ -221,3 +221,13 @@ class Shopcart(db.Model, PersistentBase):
         logging.info("Add Product after: %s", product.serialize())
         logging.info("Updated: %s", shopCart.serialize())
         shopCart.update()
+
+    @classmethod
+    def read_items(cls, customer_id):
+        """This method will read items from the existed shopcart and return the list of products
+        Args:
+            customer_id (Integer): the customer id of the shopcart from which we want to read items
+        """
+        logging.info("Read Items: %d", customer_id)
+        shop_cart = cls.find_by_customer_id(customer_id)
+        return shop_cart.products
