@@ -22,7 +22,8 @@
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
-		"bbenoist.vagrant"
+		"bbenoist.vagrant",
+		"ms-python.pylint"
 	],
 	"postCreateCommand": "sudo pip install -r requirements.txt"
 }
