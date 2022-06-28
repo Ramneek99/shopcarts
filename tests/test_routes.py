@@ -236,3 +236,34 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data[0]["customer_id"], shopcarts[1].customer_id)
+
+    def test_delete_product(self):
+        """It should delete product from a shopcart"""
+        shopcart = ShopCartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        shopcart = Shopcart()
+        shopcart.deserialize(resp.get_json())
+        product = ProductFactory()
+        product.shopcart_id = shopcart.id
+        resp = self.client.post(
+            PRODUCT_URL, json=product.serialize(), content_type="application/json"
+        )
+        product2 = ProductFactory()
+        product2.shopcart_id = shopcart.id
+        resp = self.client.post(
+            PRODUCT_URL, json=product2.serialize(), content_type="application/json"
+        )
+        resp = self.client.delete(
+            PRODUCT_URL, json=product2.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT, "Failed to delete a product")
+        found_shop_cart = Shopcart()
+        resp = self.client.get(
+            BASE_URL, query_string=f"customer_id={shopcart.customer_id}"
+        )
+        logging.info("The shopcart after deletion is %s", resp.get_json())
+        found_shop_cart.deserialize(resp.get_json()[0])
+        self.assertEqual(len(found_shop_cart.products), 1)
+        self.assertEqual(found_shop_cart.products[0].serialize(), product.serialize())
