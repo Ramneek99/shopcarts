@@ -187,7 +187,7 @@ class TestShopcartService(TestCase):
             "/test_internal_server_error", data=text, content_type="text/plain"
         )
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
     def test_add_product(self):
         """It should Create a new product and add it to shopcart"""
         shopcart = ShopCartFactory()
@@ -209,7 +209,7 @@ class TestShopcartService(TestCase):
         new_shopcart.deserialize(resp.get_json())
         logging.info("The new shopcart is: %s", resp.get_json())
         self.assertEqual(new_shopcart.products[0].serialize(), product.serialize(), "Product does not match")
-        
+
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
         self._create_shopcarts(5)
