@@ -111,21 +111,24 @@ def add_product():
 
 
 ######################################################################
-# Change the quantity for a product in a shopcart
+# DELETE A PRODUCT FROM A SHOP CART
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/<int:product_id>/<int:new_qty", methods=["POST"])
-def change_product_qty():
+@app.route("/product", methods=["DELETE"])
+def delete_product():
+    """Delete a product from existing shopcart
+    Returns:
+    The shopcart json data after deletion
     """
-    Changes the quantity of an existing product in the shopcart
-    """
-    app.logger.info("Request to change a Product quantity in a Shop Cart")
+    app.logger.info("Request to delete a Product from a Shop Cart")
     check_content_type("application/json")
-
-    shopCart = Shopcart.find(shopcart_id)
-    old_product = shopcart.products[product_id]
-    old_product.quantity = new_qty
-    shopcart.update()
-    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+    product = Product()
+    product.deserialize(request.get_json())
+    shopCart = Shopcart.find(product.shopcart_id)
+    Shopcart.delete_item(shopCart.customer_id, product.id)
+    location_url = url_for("delete_product", shopcart_id=shopCart.id, _external=True)
+    return make_response(
+        "", status.HTTP_204_NO_CONTENT, {"Location": location_url}
+    )
 
 
 ######################################################################
@@ -144,6 +147,7 @@ def list_shopcarts():
         shopcarts = Shopcart.all()
         results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
