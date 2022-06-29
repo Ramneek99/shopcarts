@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 [![Build Status](https://github.com/DevopsShopcarts/shopcarts/actions/workflows/ci.yml/badge.svg)](https://github.com/DevopsShopcarts/shopcarts/actions)
+[![codecov](https://codecov.io/gh/DevopsShopcarts/shopcarts/branch/master/graph/badge.svg?token=I5TPOTMR9A)](https://codecov.io/gh/DevopsShopcarts/shopcarts)
 
 ## Overview
 
@@ -53,6 +54,19 @@ tests/              - test cases package
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
 ```
+
+## API Routes Documentation for Shopcarts
+
+| HTTP Method | URL | Description | Return
+| :--- | :--- | :--- | :--- |
+| `GET` | `/shopcarts/{shopcart_id}` | Get shopcart based on its id | Shopcart Object
+| `POST` | `/shopcarts/{shopcart_id}` | Create a shopcart based on the data | Shopcart Object
+| `GET` | `/shopcarts/{customer_id}/products` | Returns a list of all the shopcarts | List of Shopcart Objects
+| `GET` | `/shopcarts/{customer_id}/products/{product_id}` | Get the product based on its product_id | Product Object
+| `POST` | `/shopcarts/{customer_id}/products` | Create a Product on a Shopcart | Product Object
+| `DELETE` | `/shopcarts/{customer_id}/products/{product_id}` | Delete the Product based on the product_id | 204 Status Code
+| `PUT` | `/shopcarts/{customer_id}/products/{product_id}/{quantity}` | Update a Product based on the given quantity | Product Object
+| `GET` | `/shopcarts` | Get all of the shopcarts | List of Shopcart Objects
 
 ## License
 
