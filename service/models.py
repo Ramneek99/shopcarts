@@ -141,7 +141,7 @@ class Shopcart(db.Model, PersistentBase):
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, nullable=False)
-    products = db.relationship("Product", backref="shopcart", lazy=True)
+    products = db.relationship("Product", backref="shopcart", passive_deletes=True)
 
     def __repr__(self):
         return "<Shopcart %r id=[%s]>" % (self.id, self.customer_id)

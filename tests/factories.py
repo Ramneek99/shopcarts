@@ -30,15 +30,7 @@ class ShopCartFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
-
-    @factory.post_generation
-    def products(self, create, extracted, **kwargs):
-        """Creates the products list"""
-        if not create:
-            return
-
-        if extracted:
-            self.products = extracted
+    products = []
 
 
 class ProductFactory(factory.Factory):
