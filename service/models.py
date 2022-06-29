@@ -77,7 +77,7 @@ class Product(db.Model, PersistentBase):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(260), nullable=False)  
+    name = db.Column(db.String(260), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
