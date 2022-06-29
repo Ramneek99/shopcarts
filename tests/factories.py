@@ -20,6 +20,27 @@ from factory.fuzzy import FuzzyChoice
 from service.models import Product, Shopcart
 
 
+class ShopCartFactory(factory.Factory):
+    """Creates fake shopCarts"""
+
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Maps factory to data model"""
+
+        model = Shopcart
+
+    id = factory.Sequence(lambda n: n)
+    customer_id = factory.Sequence(lambda n: n)
+
+    @factory.post_generation
+    def products(self, create, extracted, **kwargs):
+        """Creates the products list"""
+        if not create:
+            return
+
+        if extracted:
+            self.products = extracted
+
+
 class ProductFactory(factory.Factory):
     """Creates fake products"""
 
@@ -31,15 +52,4 @@ class ProductFactory(factory.Factory):
     name = FuzzyChoice(choices=["apple", "peach", "banana", "pear", "cake"])
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
     price = FuzzyChoice(choices=[0.99, 1.99, 2.99, 3.99, 4.99])
-
-
-class ShopCartFactory(factory.Factory):
-    """Creates fake shopCarts"""
-
-    class Meta:  # pylint: disable=too-few-public-methods
-        """Maps factory to data model"""
-        model = Shopcart
-
-    id = factory.Sequence(lambda n: n)
-    customer_id = factory.Sequence(lambda n: n)
-    products = []
+    shopcart = factory.SubFactory(ShopCartFactory)
