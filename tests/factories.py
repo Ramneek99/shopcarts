@@ -44,4 +44,4 @@ class ProductFactory(factory.Factory):
     name = FuzzyChoice(choices=["apple", "peach", "banana", "pear", "cake"])
     quantity = FuzzyChoice(choices=[0, 1, 2, 3, 4])
     price = FuzzyChoice(choices=[0.99, 1.99, 2.99, 3.99, 4.99])
-    shopcart = factory.SubFactory(ShopCartFactory)
+    # shopcart = factory.SubFactory(ShopCartFactory)
