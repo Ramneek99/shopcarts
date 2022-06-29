@@ -145,22 +145,22 @@ class TestShopCart(unittest.TestCase):
         self.assertEqual(new_shopcart.customer_id, shopcart.customer_id)
 
     def test_deserialize_with_key_error(self):
-        """It should not Deserialize an account with a KeyError"""
+        """It should not Deserialize an shopcart with a KeyError"""
         shopcart = Shopcart()
         self.assertRaises(DataValidationError, shopcart.deserialize, {})
 
     def test_deserialize_with_type_error(self):
-        """It should not Deserialize an account with a TypeError"""
+        """It should not Deserialize an shopcart with a TypeError"""
         shopcart = Shopcart()
         self.assertRaises(DataValidationError, shopcart.deserialize, [])
 
-    def test_deserialize_address_key_error(self):
-        """It should not Deserialize an address with a KeyError"""
+    def test_deserialize_product_key_error(self):
+        """It should not Deserialize an product with a KeyError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, {})
 
-    def test_deserialize_address_type_error(self):
-        """It should not Deserialize an address with a TypeError"""
+    def test_deserialize_product_type_error(self):
+        """It should not Deserialize an product with a TypeError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, [])
 
@@ -169,121 +169,72 @@ class TestShopCart(unittest.TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopCartFactory()
+        product = ProductFactory(shopcart=shopcart)
         shopcart.create()
-        logging.debug("Created: %s", shopcart.serialize())
-        product = ProductFactory()
-        product.shopcart_id = shopcart.id
-        Shopcart.add_product(product)
-        logging.debug("Updated: %s", shopcart.serialize())
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
 
-        new_shopcart = Shopcart.find(product.shopcart_id)
+        new_shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
+        self.assertEqual(len(new_shopcart.products), 1)
+
         self.assertEqual(new_shopcart.products[0].name, product.name)
 
         product2 = ProductFactory()
-        product2.shopcart_id = new_shopcart.id
-        logging.info("Shopcart id: %d", new_shopcart.customer_id)
-        Shopcart.add_product(product2)
-        logging.debug("Created: %s", product2.serialize())
-        new_shopcart = Shopcart.find(product2.shopcart_id)
+        shopcart.products.append(product2)
+        shopcart.update()
+
+        new_shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
         self.assertEqual(len(new_shopcart.products), 2)
         self.assertEqual(new_shopcart.products[1].name, product2.name)
-        self.assertEqual(new_shopcart.id, new_shopcart.products[1].shopcart_id)
 
     def test_update_shopcart_product(self):
-        """It should Update a shopcart's products"""
+        """It should Update a shopcart's product"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 
         shopcart = ShopCartFactory()
+        product = ProductFactory(shopcart=shopcart)
         shopcart.create()
-        # logging.debug("Created: %s", shopcart.serialize())
-        product = ProductFactory()
-        product.shopcart_id = shopcart.id
-        Shopcart.add_product(product)
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
 
         # Fetch it back
-        shopcart = Shopcart.find(shopcart.id)
+        shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
         old_product = shopcart.products[0]
+        print("%r", old_product)
         self.assertEqual(old_product.quantity, product.quantity)
-        self.assertEqual(old_product.price, product.price)
-        old_product.quantity = 30
-        old_product.price = 100
+        # Change the city
+        old_product.quantity = 40
         shopcart.update()
 
         # Fetch it back again
-        shopcart = Shopcart.find(shopcart.id)
+        shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
         product = shopcart.products[0]
-        self.assertEqual(product.quantity, 30)
-        self.assertEqual(product.price, 100)
+        self.assertEqual(product.quantity, 40)
 
     def test_delete_shopcart_product(self):
         """It should Delete a shopcart's product"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 
-        product = ProductFactory()
         shopcart = ShopCartFactory()
+        product = ProductFactory(shopcart=shopcart)
         shopcart.create()
-        shopcart.products.append(product)
-
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
 
         # Fetch it back
-        shopcart = Shopcart.find(shopcart.id)
+        shopcart = shopcart.find_by_customer_id(shopcart.customer_id)
         product = shopcart.products[0]
         product.delete()
         shopcart.update()
 
         # Fetch it back again
-        shopcart = Shopcart.find(shopcart.id)
+        shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
         self.assertEqual(len(shopcart.products), 0)
-
-    def test_delete_shopcart_product_by_id(self):
-        '''It should delete product by customer id and product id
-        no matter what the quantity of the product is'''
-        shopcarts = Shopcart.all()
-        self.assertEqual(shopcarts, [])
-        '''Create two products'''
-        product = ProductFactory()
-        product2 = ProductFactory()
-        shopcart = ShopCartFactory()
-        shopcart.create()
-        shopcart.products.append(product)
-        shopcart.products.append(product2)
-        # Assert that it was assigned an id and shows up in the database
-        self.assertIsNotNone(shopcart.id)
-        shopcarts = Shopcart.all()
-        self.assertEqual(len(shopcarts), 1)
-        deletedQuantity = Shopcart.delete_item(shopcart.customer_id, product.id)
-        self.assertEqual(deletedQuantity, product.quantity)
-        found_product = Product.find(product.id)
-        self.assertIsNone(found_product)
-        found_shopCart = Shopcart.find(shopcart.id)
-        '''There should be one product left'''
-        self.assertEqual(len(found_shopCart.products), 1)
-        self.assertEqual(found_shopCart.products[0], product2)
-
-    def test_read_items(self):
-        """It should read items from the existed shopcart"""
-        product = ProductFactory()
-        product2 = ProductFactory()
-        shopcart = ShopCartFactory()
-        product.shopcart_id = shopcart.id
-        product2.shopcart_id = shopcart.id
-        shopcart.create()
-        Shopcart.add_product(product)
-        Shopcart.add_product(product2)
-        products = Shopcart.read_items(shopcart.customer_id)
-        self.assertEqual(products[0].serialize(), product.serialize())
-        self.assertEqual(products[1].serialize(), product2.serialize())
