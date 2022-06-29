@@ -145,22 +145,22 @@ class TestShopCart(unittest.TestCase):
         self.assertEqual(new_shopcart.customer_id, shopcart.customer_id)
 
     def test_deserialize_with_key_error(self):
-        """It should not Deserialize an account with a KeyError"""
+        """It should not Deserialize an shopcart with a KeyError"""
         shopcart = Shopcart()
         self.assertRaises(DataValidationError, shopcart.deserialize, {})
 
     def test_deserialize_with_type_error(self):
-        """It should not Deserialize an account with a TypeError"""
+        """It should not Deserialize an shopcart with a TypeError"""
         shopcart = Shopcart()
         self.assertRaises(DataValidationError, shopcart.deserialize, [])
 
-    def test_deserialize_address_key_error(self):
-        """It should not Deserialize an address with a KeyError"""
+    def test_deserialize_product_key_error(self):
+        """It should not Deserialize an product with a KeyError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, {})
 
-    def test_deserialize_address_type_error(self):
-        """It should not Deserialize an address with a TypeError"""
+    def test_deserialize_product_type_error(self):
+        """It should not Deserialize an product with a TypeError"""
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, [])
 
@@ -177,6 +177,8 @@ class TestShopCart(unittest.TestCase):
         self.assertEqual(len(shopcarts), 1)
 
         new_shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)
+        self.assertEqual(len(new_shopcart.products), 1)
+
         self.assertEqual(new_shopcart.products[0].name, product.name)
 
         product2 = ProductFactory()

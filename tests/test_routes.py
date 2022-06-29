@@ -87,7 +87,7 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart(self):
         """It should Read a single Shopcart"""
-        # get the id of an account
+        # get the id of an shopcart
         shopcart = self._create_shopcarts(1)[0]
         resp = self.client.get(
             f"{BASE_URL}/{shopcart.id}", content_type="application/json"
@@ -257,7 +257,7 @@ class TestShopcartService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        # retrieve it back and make sure address is not there
+        # retrieve it back and make sure product is not there
         resp = self.client.get(
             f"{BASE_URL}/{shopcart.customer_id}/products/{product_id}",
             content_type="application/json",
