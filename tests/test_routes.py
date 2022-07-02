@@ -161,14 +161,6 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    def test_500_internal_server_error(self):
-        """It should raise 500 internal server error"""
-        text = "Hello World"
-        resp = self.client.post(
-            "/test_internal_server_error", data=text, content_type="text/plain"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     def test_add_product(self):
         """It should Add a product to a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
@@ -264,6 +256,33 @@ class TestShopcartService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_shopcart(self):
+        """It should Delete a Shopcart"""
+        # get the id of an account
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.customer_id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_update_shopcart(self):
+        """It should Update an existing shopcart"""
+        # create a Shopcart to update
+        test_shopcart = ShopCartFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{test_shopcart.customer_id}", json=test_shopcart.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the shopcart
+        new_shopcart = resp.get_json()
+        new_shopcart["products"] = []
+        new_shopcart_id = new_shopcart["customer_id"]
+        resp = self.client.put(f"{BASE_URL}/{new_shopcart_id}", json=new_shopcart)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_shopcart = resp.get_json()
+        self.assertEqual(updated_shopcart["products"], [])
+        resp = self.client.put(f"{BASE_URL}/123", json=test_shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_get_product(self):
         """It should Get a product from a shopcart"""
         # create a known product
@@ -309,19 +328,20 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         logging.debug(data)
         product_id = data["id"]
+        data["quantity"] = 123
+        data["price"] = 123
 
         # send the update back
         resp = self.client.put(
-            f"{BASE_URL}/{shopcart.customer_id}/products/{product.id}/123",
+            f"{BASE_URL}/{shopcart.customer_id}/products/{product_id}",
             json=data,
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # retrieve it back
-
         resp = self.client.get(
-            f"{BASE_URL}/{shopcart.customer_id}/products/{product.id}",
+            f"{BASE_URL}/{shopcart.customer_id}/products/{product_id}",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -331,9 +351,9 @@ class TestShopcartService(TestCase):
         self.assertEqual(data["id"], product_id)
         self.assertEqual(data["shopcart_id"], shopcart.id)
         self.assertEqual(data["quantity"], 123)
-
+        self.assertEqual(data["price"], 123)
         resp = self.client.put(
-            f"{BASE_URL}/{shopcart.customer_id}/products/125/236",
+            f"{BASE_URL}/{shopcart.customer_id}/products/125",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
