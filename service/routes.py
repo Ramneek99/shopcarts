@@ -33,15 +33,6 @@ def index():
 
 
 ######################################################################
-# TEST INTERVAL SERVER ERROR
-######################################################################
-@app.route("/test_internal_server_error", methods=["POST"])
-def test_internal_server_error():
-    """Route for testing internal server error"""
-    abort(status.HTTP_500_INTERNAL_SERVER_ERROR, "Test for internal server error")
-
-
-######################################################################
 # RETRIEVE A SHOP CART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
@@ -59,6 +50,46 @@ def get_shopcarts(shopcart_id):
         )
 
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# UPDATE AN EXISTING SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:customer_id>", methods=["PUT"])
+def update_shopcarts(customer_id):
+    """
+    Update a Shopcart
+    This endpoint will update an Account based the body that is posted
+    """
+    app.logger.info("Request to update shopcart with id: %s", customer_id)
+    check_content_type("application/json")
+    shopcart = Shopcart.find_by_customer_id(customer_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{customer_id}' was not found.",
+        )
+
+    shopcart.deserialize(request.get_json())
+    shopcart.customer_id = customer_id
+    shopcart.update()
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:customer_id>", methods=["DELETE"])
+def delete_shopcarts(customer_id):
+    """
+    Delete a Shopcart
+    This endpoint will delete a Shopcart based the id specified in the path
+    """
+    app.logger.info("Request to delete shopcart with id: %s", customer_id)
+    shopcart = Shopcart.find_by_customer_id(customer_id)
+    if shopcart:
+        shopcart.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
@@ -184,10 +215,10 @@ def delete_products(customer_id, product_id):
 # UPDATE A Product
 ######################################################################
 @app.route(
-    "/shopcarts/<int:customer_id>/products/<int:product_id>/<int:quantity>",
+    "/shopcarts/<int:customer_id>/products/<int:product_id>",
     methods=["PUT"],
 )
-def update_products(customer_id, product_id, quantity):
+def update_products(customer_id, product_id):
     """
     Update a Product
     This endpoint will update a product based the body that is posted
@@ -205,7 +236,7 @@ def update_products(customer_id, product_id, quantity):
         )
 
     product.deserialize(request.get_json())
-    product.quantity = quantity
+    product.id = product_id
     product.update()
     return make_response(jsonify(product.serialize()), status.HTTP_200_OK)
 
