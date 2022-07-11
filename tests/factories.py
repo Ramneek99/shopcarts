@@ -28,7 +28,6 @@ class ShopCartFactory(factory.Factory):
 
         model = Shopcart
 
-    id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
     products = []
 

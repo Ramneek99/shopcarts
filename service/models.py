@@ -21,15 +21,6 @@ class DataValidationError(Exception):
 class PersistentBase:
     """Base class added persistent methods"""
 
-    def create(self):
-        """
-        Creates a Shopcart to the database
-        """
-        logger.info("Creating %s", self.customer_id)
-        self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
-
     def update(self):
         """
         Updates a Shopcart to the database
@@ -53,19 +44,6 @@ class PersistentBase:
         logger.info("Processing all records")
         return cls.query.all()
 
-    @classmethod
-    def find(cls, by_id):
-        """Finds a record by it's ID"""
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
-
-    def delete(self):
-        """Removes a Shopcart from the data store"""
-        logger.info("Deleting %s", self.id)
-        deletedCnt = db.session.delete(self)
-        db.session.commit()
-        return deletedCnt
-
 
 ######################################################################
 #  P R O D U C T   M O D E L
@@ -80,7 +58,15 @@ class Product(db.Model, PersistentBase):
     name = db.Column(db.String(260), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
+    shopcart_id = db.Column(
+        db.Integer, db.ForeignKey("shopcart.customer_id"), nullable=False
+    )
+
+    @classmethod
+    def find(cls, by_id):
+        """Finds a record by it's ID"""
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
 
     def __repr__(self):
         return "<Product %r id=[%s] shopcart[%s]>" % (
@@ -89,12 +75,28 @@ class Product(db.Model, PersistentBase):
             self.shopcart_id,
         )
 
+    def delete(self):
+        """Removes a Shopcart from the data store"""
+        logger.info("Deleting %s", self.id)
+        deletedCnt = db.session.delete(self)
+        db.session.commit()
+        return deletedCnt
+
     def __str__(self):
         return "%s: %s, %s" % (
             self.name,
             self.quantity,
             self.price,
         )
+
+    def create(self):
+        """
+        Creates a Product to the database
+        """
+        logger.info("Creating %s", self.id)
+        self.id = None  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
 
     def serialize(self):
         """Serializes a Product into a dictionary"""
@@ -139,17 +141,38 @@ class Shopcart(db.Model, PersistentBase):
     app = None
 
     # Table Schema
-    id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, nullable=False)
+    customer_id = db.Column(db.Integer, primary_key=True, nullable=False)
     products = db.relationship("Product", backref="shopcart", passive_deletes=True)
 
     def __repr__(self):
-        return "<Shopcart %r id=[%s]>" % (self.id, self.customer_id)
+        return "<Shopcart %r id=[%s]>" % (self.customer_id, self.customer_id)
+
+    def update(self):
+        """
+        Updates a Shopcart to the database
+        """
+        logger.info("Updating %s", self.customer_id)
+        db.session.commit()
+
+    def delete(self):
+        """Removes a Shopcart from the data store"""
+        logger.info("Deleting %s", self.customer_id)
+        deletedCnt = db.session.delete(self)
+        db.session.commit()
+        return deletedCnt
+
+    def create(self, customer_id):
+        """
+        Creates a Shopcart to the database
+        """
+        logger.info("Creating %s", customer_id)
+        self.customer_id = customer_id  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
 
     def serialize(self):
         """Serializes a Shopcart into a dictionary"""
         shopcart = {
-            "id": self.id,
             "customer_id": self.customer_id,
             "products": [],
         }
@@ -164,7 +187,6 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id = data["id"]
             self.customer_id = data["customer_id"]
             # handle inner list of products
             product_list = data.get("products")
