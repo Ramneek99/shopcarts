@@ -72,7 +72,7 @@ class TestShopcartService(TestCase):
                 "Could not create test Shopcart",
             )
             new_shopcart = resp.get_json()
-            shopcart.id = new_shopcart["id"]
+            shopcart.customer_id = new_shopcart["customer_id"]
             shopcarts.append(shopcart)
         return shopcarts
 
@@ -90,7 +90,7 @@ class TestShopcartService(TestCase):
         # get the id of an shopcart
         shopcart = self._create_shopcarts(1)[0]
         resp = self.client.get(
-            f"{BASE_URL}/{shopcart.id}", content_type="application/json"
+            f"{BASE_URL}/{shopcart.customer_id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -180,7 +180,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         data = resp.get_json()
         logging.debug(data)
-        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["shopcart_id"], shopcart.customer_id)
         self.assertEqual(data["name"], product.name)
         self.assertEqual(data["quantity"], product.quantity)
         self.assertEqual(data["price"], product.price)
@@ -308,7 +308,7 @@ class TestShopcartService(TestCase):
 
         data = resp.get_json()
         logging.debug(data)
-        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["shopcart_id"], shopcart.customer_id)
         self.assertEqual(data["name"], product.name)
         self.assertEqual(data["quantity"], product.quantity)
         self.assertEqual(data["price"], product.price)
@@ -349,7 +349,7 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         logging.debug(data)
         self.assertEqual(data["id"], product_id)
-        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["shopcart_id"], shopcart.customer_id)
         self.assertEqual(data["quantity"], 123)
         self.assertEqual(data["price"], 123)
         resp = self.client.put(

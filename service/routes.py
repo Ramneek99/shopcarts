@@ -35,18 +35,18 @@ def index():
 ######################################################################
 # RETRIEVE A SHOP CART
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
-def get_shopcarts(shopcart_id):
+@app.route("/shopcarts/<int:customer_id>", methods=["GET"])
+def get_shopcarts(customer_id):
     """
     Retrieve a shopcart of a customer
     This endpoint will return a shopcart based on it's id
     """
-    app.logger.info("Request for Shopcart with id: %s", shopcart_id)
-    shopcart = Shopcart.find(shopcart_id)
+    app.logger.info("Request for Shopcart with id: %s", customer_id)
+    shopcart = Shopcart.find_by_customer_id(customer_id)
     if not shopcart:
         abort(
             status.HTTP_400_BAD_REQUEST,
-            f"Shopcart with id '{shopcart_id}' could not be found.",
+            f"Shopcart with id '{customer_id}' could not be found.",
         )
 
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
@@ -112,10 +112,11 @@ def create_shopcarts(customer_id):
         abort(
             status.HTTP_409_CONFLICT, f"Shopcart {shopcart.customer_id} already exists"
         )
-    shopcart.create()
-    shopcart.customer_id = customer_id
+    shopcart.create(customer_id)
     message = Shopcart.find_by_customer_id(shopcart.customer_id).serialize()
-    location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
+    location_url = url_for(
+        "get_shopcarts", customer_id=shopcart.customer_id, _external=True
+    )
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
