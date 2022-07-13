@@ -203,6 +203,13 @@ class Shopcart(db.Model, PersistentBase):
             )
         return self
 
+
+    @classmethod
+    def filter_by_product_id(cls, product_id):
+        """Returns Shopcarts which has the give product_id"""
+        return cls.query.filter(filter(lambda p: p.product_id==product_id, cls.products)!=None)
+
+
     @classmethod
     def find_by_customer_id(cls, customer_id):
         """Returns the Shopcart with the given customer id

@@ -357,3 +357,5 @@ class TestShopcartService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_filter_product
