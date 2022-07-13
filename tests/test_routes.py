@@ -175,7 +175,7 @@ class TestShopcartService(TestCase):
         response = requests.get(f"{BASE_URL}/886")
         app.config["TESTING"] = True
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+ 
     def test_add_product(self):
         """It should Add a product to a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
