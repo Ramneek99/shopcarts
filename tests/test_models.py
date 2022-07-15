@@ -287,10 +287,14 @@ class TestShopCart(unittest.TestCase):
         shopcart3.create(shopcart3.customer_id)
         product = ProductFactory(shopcart=shopcart)
         product.create()
-        product.shopcart_id = shopcart2.customer_id
-        shopcart2.products.append(product)
+        shopcart.products.append(product)
+        shopcart.update()
+        product2 = ProductFactory(shopcart=shopcart2)
+        product2.name = product.name
+        product2.create()
+        shopcart2.products.append(product2)
         shopcart2.update()
-        filtered_shopcarts = Shopcart.filter_by_product_id(product.id)
+        filtered_shopcarts = Shopcart.filter_by_product_name(product.name)
         # self.assertEqual(len(filtered_shopcarts), 2)
         self.assertEqual(Shopcart.serialize(filtered_shopcarts[0]), Shopcart.serialize(shopcart))
         self.assertEqual(Shopcart.serialize(filtered_shopcarts[1]), Shopcart.serialize(shopcart2))

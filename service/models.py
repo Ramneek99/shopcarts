@@ -4,7 +4,10 @@ Models for ShopCart
 All of the models are stored in this module
 """
 import logging
+from typing import Iterable
 from flask_sqlalchemy import SQLAlchemy
+from functools import reduce
+from sqlalchemy import exists, func, select
 
 logger = logging.getLogger("flask.app")
 
@@ -128,6 +131,15 @@ class Product(db.Model, PersistentBase):
                 "bad or no data " + error.args[0]
             )
         return self
+    
+    @classmethod
+    def filter_by_product_name(cls, product_name):
+        """
+        Filter products by product_name
+        Args:
+            product_name(string): the name of the product that will be filtered out
+        """
+        return cls.query.filter(cls.name==product_name)
 
 
 ######################################################################
@@ -203,12 +215,16 @@ class Shopcart(db.Model, PersistentBase):
             )
         return self
 
+    # @hybrid_method
+    # def check_product_name(cls):
+    #     return 
 
     @classmethod
-    def filter_by_product_id(cls, product_id):
-        """Returns Shopcarts which has the give product_id"""
-        return cls.query.filter(filter(lambda p: p.product_id==product_id, cls.products)!=None)
-
+    def filter_by_product_name(cls, product_name):
+        """Returns Shopcarts which has the give product_name"""
+        logger.info("Product name is: %s", product_name)
+        selected_products = Product.filter_by_product_name(product_name)
+        return [Shopcart.find_by_customer_id(product.shopcart_id) for product in selected_products]
 
     @classmethod
     def find_by_customer_id(cls, customer_id):
