@@ -287,10 +287,11 @@ class TestShopCart(unittest.TestCase):
         shopcart3.create(shopcart3.customer_id)
         product = ProductFactory(shopcart=shopcart)
         product.create()
+        name = product.name
         shopcart.products.append(product)
         shopcart.update()
         product2 = ProductFactory(shopcart=shopcart2)
-        product2.name = product.name
+        product2.name = name
         product2.create()
         shopcart2.products.append(product2)
         shopcart2.update()
