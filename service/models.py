@@ -4,10 +4,7 @@ Models for ShopCart
 All of the models are stored in this module
 """
 import logging
-from typing import Iterable
 from flask_sqlalchemy import SQLAlchemy
-from functools import reduce
-from sqlalchemy import exists, func, select
 
 logger = logging.getLogger("flask.app")
 
@@ -17,7 +14,6 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
-
     pass
 
 
@@ -131,7 +127,7 @@ class Product(db.Model, PersistentBase):
                 "bad or no data " + error.args[0]
             )
         return self
-    
+
     @classmethod
     def filter_by_product_name(cls, product_name):
         """
@@ -139,7 +135,7 @@ class Product(db.Model, PersistentBase):
         Args:
             product_name(string): the name of the product that will be filtered out
         """
-        return cls.query.filter(cls.name==product_name)
+        return cls.query.filter(cls.name == product_name)
 
 
 ######################################################################
@@ -214,10 +210,6 @@ class Shopcart(db.Model, PersistentBase):
                 "bad or no data - " + error.args[0]
             )
         return self
-
-    # @hybrid_method
-    # def check_product_name(cls):
-    #     return 
 
     @classmethod
     def filter_by_product_name(cls, product_name):
