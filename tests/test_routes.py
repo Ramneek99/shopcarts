@@ -80,6 +80,16 @@ class TestShopcartService(TestCase):
             shopcarts.append(shopcart)
         return shopcarts
 
+    def _find_shopcarts(self, shopcarts):
+        """Factory method to find shopcarts in bulk"""
+        rst = []
+        for shopcart in shopcarts:
+            resp = self.client.get(
+                f"{BASE_URL}/{shopcart.customer_id}", content_type="application/json"
+            )
+            rst.append(shopcart.deserialize(resp.get_json()))
+        return rst
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -372,3 +382,24 @@ class TestShopcartService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_filter_shopcarts_by_product_name(self):
+        """It should Filter Shop Carts by product name"""
+        shopcarts = self._create_shopcarts(3)
+        product = ProductFactory()
+        name = product.name
+        for i in range(2):
+            product = ProductFactory()
+            product.name = name
+            product.shopcart_id = shopcarts[i].customer_id
+            resp = self.client.post(
+                f"{BASE_URL}/{shopcarts[i].customer_id}/products",
+                json=product.serialize(),
+                content_type="application/json",
+            )
+        shopcarts = self._find_shopcarts(shopcarts)
+        resp = self.client.get(f"{BASE_URL}/products/{product.name}")
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0], Shopcart.serialize(shopcarts[0]))
+        self.assertEqual(data[1], Shopcart.serialize(shopcarts[1]))
