@@ -8,12 +8,16 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
+from mockito import when
+from mockito import mock
+import requests
 
 # from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -171,6 +175,17 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_500_error_handler(self):
+        """It should return 500 error"""
+        response = mock({
+            'status_code': 500,
+        }, spec=requests.Response)
+        when(requests).get(f"{BASE_URL}/886").thenReturn(response)
+        app.config["TESTING"] = False
+        response = requests.get(f"{BASE_URL}/886")
+        app.config["TESTING"] = True
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def test_add_product(self):
         """It should Add a product to a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
@@ -291,6 +306,40 @@ class TestShopcartService(TestCase):
         updated_shopcart = resp.get_json()
         self.assertEqual(updated_shopcart["products"], [])
         resp = self.client.put(f"{BASE_URL}/123", json=test_shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_clear_shopcart(self):
+        """It should clear an existing shopcart's products"""
+        # create a Shopcart to clear
+        test_shopcart = self._create_shopcarts(1)[0]
+        product = ProductFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{test_shopcart.customer_id}/products",
+            json=product.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        product2 = ProductFactory()
+
+        resp = self.client.post(
+            f"{BASE_URL}/{test_shopcart.customer_id}/products",
+            json=product2.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        resp = self.client.get(f"{BASE_URL}/{test_shopcart.customer_id}/products")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+        # clear the shopcart
+        resp = self.client.put(
+            f"{BASE_URL}/{test_shopcart.customer_id}/clear",
+            json=test_shopcart.serialize(),
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_shopcart = resp.get_json()
+        self.assertEqual(updated_shopcart["products"], [])
+        resp = self.client.put(f"{BASE_URL}/123/clear", json=test_shopcart.serialize())
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_product(self):

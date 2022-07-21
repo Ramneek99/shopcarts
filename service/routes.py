@@ -233,7 +233,7 @@ def update_products(customer_id, product_id):
     if not product:
         abort(
             status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{product_id}' could not be found.",
+            f"Product with id '{product_id}' could not be found.",
         )
 
     product.deserialize(request.get_json())
@@ -258,6 +258,28 @@ def list_shopcarts():
         shopcarts = Shopcart.all()
         results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
+
+@app.route("/shopcarts/<int:customer_id>/clear", methods=["PUT"])
+def clear_shopcarts(customer_id):
+    """Clear a shop cart according to customer id"""
+    app.logger.info("Request to clear shop cart for customer id: %s", (customer_id))
+    check_content_type("application/json")
+
+    shopcart = Shopcart.find_by_customer_id(customer_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{customer_id}' could not be found.",
+        )
+
+    shopcart.deserialize(request.get_json())
+    for product in shopcart.products:
+        product.delete()
+    shopcart.products = []
+    shopcart.customer_id = customer_id
+    shopcart.update()
+    return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
