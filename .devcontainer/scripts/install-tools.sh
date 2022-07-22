@@ -1,6 +1,7 @@
 #!/bin/bash
 
-cat /app/scripts/bash_aliases >> $HOME/.bash_aliases
+cat /app/.devcontainer/scripts/bash_aliases >> $HOME/.bash_aliases
+source $HOME/.bash_aliases
 
 # Platform specific installs
 if [ $(uname -m) == aarch64 ]; then

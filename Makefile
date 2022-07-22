@@ -1,4 +1,6 @@
 .PHONY: all help install venv test run login
+
+## Add some environment variables
 REGISTRY ?= us.icr.io
 NAMESPACE ?= nyu_devops
 IMAGE_NAME ?= shopcarts 
