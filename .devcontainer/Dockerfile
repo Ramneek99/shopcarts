@@ -44,3 +44,7 @@ USER $USERNAME
 # Install user mode tools
 COPY /.devcontainer/scripts/install-tools.sh /tmp/
 RUN cd /tmp; bash ./install-tools.sh
+
+# Install user mode tools
+RUN ibmcloud plugin install container-service -r 'IBM Cloud' && \
+    ibmcloud plugin install container-registry -r 'IBM Cloud'
