@@ -14,7 +14,6 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
-
     pass
 
 
@@ -119,7 +118,6 @@ class Product(db.Model, PersistentBase):
             self.name = data["name"]
             self.price = data["price"]
             self.quantity = data["quantity"]
-            self.id = data["id"]
         except KeyError as error:
             raise DataValidationError("Invalid Product: missing " + error.args[0])
         except TypeError as error:
@@ -128,6 +126,15 @@ class Product(db.Model, PersistentBase):
                 "bad or no data " + error.args[0]
             )
         return self
+
+    @classmethod
+    def filter_by_product_name(cls, product_name):
+        """
+        Filter products by product_name
+        Args:
+            product_name(string): the name of the product that will be filtered out
+        """
+        return cls.query.filter(cls.name == product_name)
 
 
 ######################################################################
@@ -202,6 +209,13 @@ class Shopcart(db.Model, PersistentBase):
                 "bad or no data - " + error.args[0]
             )
         return self
+
+    @classmethod
+    def filter_by_product_name(cls, product_name):
+        """Returns Shopcarts which has the give product_name"""
+        logger.info("Product name is: %s", product_name)
+        selected_products = Product.filter_by_product_name(product_name)
+        return [Shopcart.find_by_customer_id(product.shopcart_id) for product in selected_products]
 
     @classmethod
     def find_by_customer_id(cls, customer_id):

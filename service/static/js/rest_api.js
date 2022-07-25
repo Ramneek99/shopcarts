@@ -217,7 +217,6 @@ $(function () {
     $("#add-btn").click(function () {
 
         let customer_id = $("#customer_id").val();
-        let product_id = $("#product_id").val();
         let price = $("#product_price").val();
         let quantity = $("#product_quantity").val();
         let name = $("#product_name").val();
@@ -229,7 +228,6 @@ $(function () {
             "name":name,
             "price":price,
             "quantity":quantity,
-            "id":product_id
         };
         let ajax = $.ajax({
             type: "POST",
@@ -245,7 +243,6 @@ $(function () {
         });
 
         ajax.fail(function(res){
-            clear_form_data()
             flash_message(res.responseJSON.message)
         });
 
@@ -329,35 +326,17 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
+        let name = $("#product_name").val();
 
-        let queryString = ""
-
-        if (name) {
-            queryString += 'name=' + name
+        if (!name) {
+            flash_message("Name needed")
+            return;
         }
-        if (category) {
-            if (queryString.length > 0) {
-                queryString += '&category=' + category
-            } else {
-                queryString += 'category=' + category
-            }
-        }
-        if (available) {
-            if (queryString.length > 0) {
-                queryString += '&available=' + available
-            } else {
-                queryString += 'available=' + available
-            }
-        }
-
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/pets?${queryString}`,
+            url: `/shopcarts/products/${name}`,
             contentType: "application/json",
             data: ''
         })
@@ -369,25 +348,21 @@ $(function () {
             table += '<thead><tr>'
             table += '<th class="col-md-2">ID</th>'
             table += '<th class="col-md-2">Name</th>'
-            table += '<th class="col-md-2">Category</th>'
-            table += '<th class="col-md-2">Available</th>'
-            table += '<th class="col-md-2">Gender</th>'
-            table += '<th class="col-md-2">Birthday</th>'
             table += '</tr></thead><tbody>'
-            let firstPet = "";
+            let firstProduct = "";
             for(let i = 0; i < res.length; i++) {
-                let pet = res[i];
-                table +=  `<tr id="row_${i}"><td>${pet.id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td><td>${pet.birthday}</td></tr>`;
+                let product = res[i];
+                table +=  `<tr id="row_${i}"><td>${product.customer_id}</td><td>${name}</td></tr>`;
                 if (i == 0) {
-                    firstPet = pet;
+                    firstProduct = product;
                 }
             }
             table += '</tbody></table>';
             $("#search_results").append(table);
 
             // copy the first result to the form
-            if (firstPet != "") {
-                update_form_data(firstPet)
+            if (firstProduct != "") {
+                update_product_form_data(firstProduct)
             }
 
             flash_message("Success")

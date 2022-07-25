@@ -276,6 +276,20 @@ def clear_shopcarts(customer_id):
 
 
 ######################################################################
+# FILTER SHOP CARTS GIVEN A PRODUCT
+######################################################################
+@app.route(
+    "/shopcarts/products/<string:product_name>",
+    methods=["GET"],
+)
+def filter_shopcarts_by_product_name(product_name):
+    """Return all shopcarts which contain the given product"""
+    app.logger.info("Request for Shop Carts with given product")
+    shopcarts = Shopcart.filter_by_product_name(product_name)
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 

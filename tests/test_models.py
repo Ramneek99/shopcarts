@@ -276,3 +276,26 @@ class TestShopCart(unittest.TestCase):
         self.assertIsNotNone(product)
         same_product = Product.find(product.id)
         self.assertEqual(product.id, same_product.id)
+
+    def test_filter_shopcarts_by_product(self):
+        """It should Filter shopcarts by given product"""
+        shopcart = ShopCartFactory()
+        shopcart.create(shopcart.customer_id)
+        shopcart2 = ShopCartFactory()
+        shopcart2.create(shopcart2.customer_id)
+        shopcart3 = ShopCartFactory()
+        shopcart3.create(shopcart3.customer_id)
+        product = ProductFactory(shopcart=shopcart)
+        product.create()
+        name = product.name
+        shopcart.products.append(product)
+        shopcart.update()
+        product2 = ProductFactory(shopcart=shopcart2)
+        product2.name = name
+        product2.create()
+        shopcart2.products.append(product2)
+        shopcart2.update()
+        filtered_shopcarts = Shopcart.filter_by_product_name(product.name)
+        # self.assertEqual(len(filtered_shopcarts), 2)
+        self.assertEqual(Shopcart.serialize(filtered_shopcarts[0]), Shopcart.serialize(shopcart))
+        self.assertEqual(Shopcart.serialize(filtered_shopcarts[1]), Shopcart.serialize(shopcart2))
