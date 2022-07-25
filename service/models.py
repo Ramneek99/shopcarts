@@ -100,7 +100,6 @@ class Product(db.Model, PersistentBase):
     def serialize(self):
         """Serializes a Product into a dictionary"""
         return {
-            "id": self.id,
             "shopcart_id": self.shopcart_id,
             "name": self.name,
             "price": self.price,
