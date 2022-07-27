@@ -435,5 +435,5 @@ class TestShopcartService(TestCase):
         resp = self.client.get(f"{BASE_URL}/products/{product.name}")
         data = resp.get_json()
         self.assertEqual(len(data), 2)
-        self.assertEqual(data[0], Shopcart.serialize(shopcarts[0]))
-        self.assertEqual(data[1], Shopcart.serialize(shopcarts[1]))
+        self.assertEqual(data[0]["customer_id"], shopcarts[0].customer_id)
+        self.assertEqual(data[1]["customer_id"], shopcarts[1].customer_id)
