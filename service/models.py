@@ -118,7 +118,6 @@ class Product(db.Model, PersistentBase):
             self.name = data["name"]
             self.price = data["price"]
             self.quantity = data["quantity"]
-            self.id = data["id"]
         except KeyError as error:
             raise DataValidationError("Invalid Product: missing " + error.args[0])
         except TypeError as error:
