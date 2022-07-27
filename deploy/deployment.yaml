@@ -19,7 +19,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: shopcarts
-        image: icr.io/nyu_devops/shopcarts:1.0
+        image: icr.io/develop/shopcarts:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
