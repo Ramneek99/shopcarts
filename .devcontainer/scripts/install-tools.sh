@@ -1,7 +1,10 @@
-#!/bin/bash
+# !/bin/bash
 
-cat /app/.devcontainer/scripts/bash_aliases >> $HOME/.bash_aliases
-source $HOME/.bash_aliases
+echo "Creating aliases for new tools..."
+echo "alias ic='/usr/local/bin/ibmcloud'" >> $HOME/.bash_aliases
+echo "alias kc='/usr/local/bin/kubectl'" >> $HOME/.bash_aliases
+echo "alias ku='/usr/local/bin/kustomize'" >> $HOME/.bash_aliases
+echo "alias kns='kubectl config set-context --current --namespace'" >> $HOME/.bash_aliases
 
 # Platform specific installs
 if [ $(uname -m) == aarch64 ]; then

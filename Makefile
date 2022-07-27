@@ -1,5 +1,5 @@
 ## Add some environment variables
-REGISTRY ?= us.icr.io
+REGISTRY ?= icr.io
 NAMESPACE ?= nyu_devops
 IMAGE_NAME ?= shopcarts
 IMAGE_TAG ?= 1.0
@@ -40,7 +40,7 @@ run: ## Run the service
 
 login: ## Login to ibm cloud
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
-	ibmcloud login -a cloud.ibm.com -g $(RESOURCE_GROUP_ID) -r us-south --apikey @~/apikey.json
+	ibmcloud login -a cloud.ibm.com -g Default --no-region --apikey @~/apikey.json
 	ibmcloud cr login
 	ibmcloud ks cluster config --cluster $(CLUSTER)
 	kubectl cluster-info
