@@ -14,6 +14,7 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
+
     pass
 
 
@@ -57,9 +58,7 @@ class Product(db.Model, PersistentBase):
     name = db.Column(db.String(260), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    shopcart_id = db.Column(
-        db.Integer, db.ForeignKey("shopcart.id"), nullable=False
-    )
+    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
 
     @classmethod
     def find(cls, by_id):
@@ -220,7 +219,9 @@ class Shopcart(db.Model, PersistentBase):
         """Returns Shopcarts which has the give product_name"""
         logger.info("Product name is: %s", product_name)
         selected_products = Product.filter_by_product_name(product_name)
-        return [Shopcart.find_by_id(product.shopcart_id) for product in selected_products]
+        return [
+            Shopcart.find_by_id(product.shopcart_id) for product in selected_products
+        ]
 
     @classmethod
     def find_by_id(cls, id):

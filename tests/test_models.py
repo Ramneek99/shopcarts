@@ -297,5 +297,9 @@ class TestShopCart(unittest.TestCase):
         shopcart2.update()
         filtered_shopcarts = Shopcart.filter_by_product_name(product.name)
         # self.assertEqual(len(filtered_shopcarts), 2)
-        self.assertEqual(Shopcart.serialize(filtered_shopcarts[0]), Shopcart.serialize(shopcart))
-        self.assertEqual(Shopcart.serialize(filtered_shopcarts[1]), Shopcart.serialize(shopcart2))
+        self.assertEqual(
+            Shopcart.serialize(filtered_shopcarts[0]), Shopcart.serialize(shopcart)
+        )
+        self.assertEqual(
+            Shopcart.serialize(filtered_shopcarts[1]), Shopcart.serialize(shopcart2)
+        )

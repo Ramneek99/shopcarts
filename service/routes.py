@@ -68,6 +68,7 @@ def update_shopcarts(id):
     shopcart.update()
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
+
 ######################################################################
 # DELETE A SHOPCART
 ######################################################################
@@ -101,14 +102,10 @@ def create_shopcarts(id):
     logging.info("To create shopcart with id: %d", shopcart.id)
     if found_shop_cart is not None:
         logging.info("Found shopcart: %s", type(found_shop_cart))
-        abort(
-            status.HTTP_409_CONFLICT, f"Shopcart {shopcart.id} already exists"
-        )
+        abort(status.HTTP_409_CONFLICT, f"Shopcart {shopcart.id} already exists")
     shopcart.create(id)
     message = Shopcart.find_by_id(shopcart.id).serialize()
-    location_url = url_for(
-        "get_shopcarts", id=shopcart.id, _external=True
-    )
+    location_url = url_for("get_shopcarts", id=shopcart.id, _external=True)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
@@ -164,9 +161,7 @@ def add_products(id):
     Create a Product on a Shopcart
     This endpoint will add a product to a shopcart
     """
-    app.logger.info(
-        "Request to create a Products for Shopcart with id: %s", id
-    )
+    app.logger.info("Request to create a Products for Shopcart with id: %s", id)
     check_content_type("application/json")
 
     shopcart = Shopcart().find_by_id(id)
@@ -287,6 +282,7 @@ def filter_shopcarts_by_product_name(product_name):
     shopcarts = Shopcart.filter_by_product_name(product_name)
     results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

@@ -8,6 +8,7 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
+
 # from mockito import when
 # from mockito import mock
 import requests
@@ -131,9 +132,7 @@ class TestShopcartService(TestCase):
 
         # Check the data is correct
         new_shopcart = resp.get_json()
-        self.assertEqual(
-            new_shopcart["id"], shopcart.id, "Names does not match"
-        )
+        self.assertEqual(new_shopcart["id"], shopcart.id, "Names does not match")
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Product does not match"
         )
@@ -142,9 +141,7 @@ class TestShopcartService(TestCase):
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
-        self.assertEqual(
-            new_shopcart["id"], shopcart.id, "Names does not match"
-        )
+        self.assertEqual(new_shopcart["id"], shopcart.id, "Names does not match")
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
@@ -186,6 +183,7 @@ class TestShopcartService(TestCase):
         app.config["TESTING"] = True
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
     '''
+
     def test_add_product(self):
         """It should Add a product to a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
@@ -221,9 +219,7 @@ class TestShopcartService(TestCase):
     def test_get_shopcart_by_id(self):
         """It should Get a shop cart by customer id"""
         shopcarts = self._create_shopcarts(3)
-        resp = self.client.get(
-            BASE_URL, query_string=f"id={shopcarts[1].id}"
-        )
+        resp = self.client.get(BASE_URL, query_string=f"id={shopcarts[1].id}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data[0]["id"], shopcarts[1].id)
@@ -351,7 +347,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(data["name"], product.name)
         self.assertEqual(data["quantity"], product.quantity)
         self.assertEqual(data["price"], product.price)
-    
+
     def test_update_product(self):
         """It should Update a product on a shopcart"""
         # create a known product
@@ -396,7 +392,7 @@ class TestShopcartService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_filter_shopcarts_by_product_name(self):
         """It should Filter Shop Carts by product name"""
         shopcarts = self._create_shopcarts(3)
@@ -426,16 +422,15 @@ class TestShopcartService(TestCase):
         shopcart = ShopCartFactory(products=products)
         shopcart.id = shopcart_id
         logging.debug(f"innitial Shopcart = {shopcart.serialize()}")
-        resp = self.client.post(f"{BASE_URL}/{shopcart.id}", json = shopcart.serialize())
-        self.assertEqual(resp.status_code,status.HTTP_201_CREATED)
+        resp = self.client.post(f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         resp = self.client.get(f"{BASE_URL}/{shopcart.id}")
         returned_shopcart = resp.get_json()
         logging.debug(f"Returned Shopcat = {returned_shopcart}")
-        self.assertEqual(len(returned_shopcart["products"]),3)
+        self.assertEqual(len(returned_shopcart["products"]), 3)
         product = ProductFactory()
         returned_shopcart["products"] = [product.serialize()]
-        resp = self.client.put(f"{BASE_URL}/{shopcart.id}", json = returned_shopcart)
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}", json=returned_shopcart)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_shopcart = resp.get_json()
-        self.assertEqual(len(updated_shopcart["products"]),1)
-
+        self.assertEqual(len(updated_shopcart["products"]), 1)
