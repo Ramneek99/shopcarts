@@ -172,17 +172,19 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    ''' def test_500_error_handler(self):
+    def test_500_error_handler(self):
         """It should return 500 error"""
-        response = mock({
-            'status_code': 500,
-        }, spec=requests.Response)
+        response = mock(
+            {
+                "status_code": 500,
+            },
+            spec=requests.Response,
+        )
         when(requests).get(f"{BASE_URL}/886").thenReturn(response)
         app.config["TESTING"] = False
         response = requests.get(f"{BASE_URL}/886")
         app.config["TESTING"] = True
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-    '''
 
     def test_add_product(self):
         """It should Add a product to a shopcart"""

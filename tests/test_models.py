@@ -107,7 +107,7 @@ class TestShopCart(unittest.TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 5)
 
-    def test_find_by_id(self):
+    def test_find_by_customer_id(self):
         """It should Find an Shopcart by customer id"""
         shopcart = ShopCartFactory()
         shopcart.create(shopcart.id)
