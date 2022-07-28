@@ -9,8 +9,8 @@ import os
 import logging
 from unittest import TestCase
 
-# from mockito import when
-# from mockito import mock
+from mockito import when
+from mockito import mock
 import requests
 
 # from unittest.mock import MagicMock, patch
