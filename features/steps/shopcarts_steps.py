@@ -48,5 +48,5 @@ def step_impl(context):
             "quantity": row["quantity"],
             "price": row["price"]
         }
-        context.resp = requests.post(rest_endpoint, json=product_payload)
+        context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload)
         expect(context.resp.status_code).to_equal(201)
