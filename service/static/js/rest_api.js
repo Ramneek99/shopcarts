@@ -13,7 +13,7 @@ $(function () {
         $("#product_price").val(res.price);
     }
     function update_shopcart_form_data(res){
-        $("#customer_id").val(res.customer_id);
+        $("#customer_id").val(res.id);
     }
     /// Clears all form fields
     function clear_form_data() {
@@ -38,7 +38,7 @@ $(function () {
         let customer_id = $("#customer_id").val();
 
         let data = {
-            "customer_id": customer_id,
+            "id": customer_id,
             "products":[]
         };
 
@@ -150,7 +150,7 @@ $(function () {
 
         let customer_id = $("#customer_id").val();
         let data = {
-            "customer_id": customer_id,
+            "id": customer_id,
             "products":[]
         };
         $("#flash_message").empty();
@@ -321,6 +321,69 @@ $(function () {
     });
 
     // ****************************************
+    // Update a Shop Cart
+    // ****************************************
+ 
+    $("#update-shopcart-btn").click(function () {
+
+        let id = $("#customer_id").val();
+        
+        let price = $("#product_price").val();
+        let quantity = $("#product_quantity").val();
+        let name = $("#product_name").val();
+
+        $("#flash_message").empty();
+
+
+        //let data2 = {
+        //    "shopcart_id": customer_id,
+        //    "name":name,
+        //    "price":price,
+        //    "quantity":quantity,
+        //};
+
+        let data1 = {
+            "id": customer_id,
+            "products": [],
+        }
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/shopcarts/${customer_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data1),
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            update_shopcart_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+        //let ajax2 = $.ajax({
+        //    type: "POST",
+        //    url: `/shopcarts/${customer_id}/products`,
+        //    contentType: "application/json",
+        //    data: JSON.stringify(data2),
+        //})
+
+        //ajax2.done(function(res){
+            //alert(res.toSource())
+        //    update_product_form_data(res)
+        //    flash_message("Success")
+        //});
+
+        //ajax2.fail(function(res){
+        //    flash_message(res.responseJSON.message)
+        //});
+
+    });
+
+    // ****************************************
     // Search for a Shop Cart based on a product
     // ****************************************
 
@@ -352,7 +415,7 @@ $(function () {
             let firstProduct = "";
             for(let i = 0; i < res.length; i++) {
                 let product = res[i];
-                table +=  `<tr id="row_${i}"><td>${product.customer_id}</td><td>${name}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${product.id}</td><td>${name}</td></tr>`;
                 if (i == 0) {
                     firstProduct = product;
                 }
