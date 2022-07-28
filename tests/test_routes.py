@@ -421,33 +421,21 @@ class TestShopcartService(TestCase):
     def test_update_shopcart(self):
         """It should Update an existing shopcart"""
         # create an Account to update
-        shopcart = ShopCartFactory()
-        resp = self.client.post(f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        shopcart_id = 1234
+        products = ProductFactory.create_batch(3)
+        shopcart = ShopCartFactory(products=products)
+        shopcart.id = shopcart_id
+        logging.debug(f"innitial Shopcart = {shopcart.serialize()}")
+        resp = self.client.post(f"{BASE_URL}/{shopcart.id}", json = shopcart.serialize())
+        self.assertEqual(resp.status_code,status.HTTP_201_CREATED)
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}")
+        returned_shopcart = resp.get_json()
+        logging.debug(f"Returned Shopcat = {returned_shopcart}")
+        self.assertEqual(len(returned_shopcart["products"]),3)
         product = ProductFactory()
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/products",
-            json=product.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        resp = self.client.get(
-            f"{BASE_URL}/{shopcart.id}"
-        )
-        data = resp.get_json()
-        logging.debug(data)
-        product2 = ProductFactory()
-        logging.debug("before")
-        logging.debug(data["products"])
-        product2.shopcart_id = data["id"]
-
-        data["products"].pop()
-        data["products"].append(product2)
-        logging.debug(product2)
-        logging.debug("after")
-        logging.debug(data["products"])
-        new_shopcart_id = data["id"]
-        resp = self.client.put(f"{BASE_URL}/{new_shopcart_id}", json=data)
+        returned_shopcart["products"] = [product.serialize()]
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}", json = returned_shopcart)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_account = resp.get_json()
-        self.assertEqual(updated_account["products"], product2)
+        updated_shopcart = resp.get_json()
+        self.assertEqual(len(updated_shopcart["products"]),1)
+
