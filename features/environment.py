@@ -2,7 +2,9 @@
 Environment for Behave Testing
 """
 from os import getenv
+from webbrowser import Chrome
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
 BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
@@ -16,7 +18,7 @@ def before_all(context):
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")  # Bypass OS security model
     options.add_argument("--headless")
-    context.driver = webdriver.Chrome(options=options)
+    context.driver = webdriver.Chrome(executable_path="/chromedriver/chromedriver", options=options)
     context.driver.implicitly_wait(context.WAIT_SECONDS)  # seconds
     # -- SET LOG LEVEL: behave --logging-level=ERROR ...
     # on behave command-line or in "behave.ini"

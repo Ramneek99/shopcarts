@@ -9,11 +9,11 @@ For information on Waiting until elements are present in the HTML see:
 import requests
 from behave import given
 from compare import expect
+import logging
 
-
-@given('the following pets')
+@given('the following shopcarts')
 def step_impl(context):
-    """ Delete all Pets and load new ones """
+    """ Delete all shopcarts and load new ones """
     # List all of the pets and delete them one by one
     rest_endpoint = f"{context.BASE_URL}/shopcarts"
     context.resp = requests.get(rest_endpoint)
@@ -50,3 +50,9 @@ def step_impl(context):
         }
         context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload)
         expect(context.resp.status_code).to_equal(201)
+    rest_endpoint = f"{context.BASE_URL}/shopcarts"
+    context.resp = requests.get(rest_endpoint)
+    for shopcart in context.resp.json():
+        logging.info(shopcart)
+
+        

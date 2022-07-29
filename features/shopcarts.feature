@@ -12,3 +12,8 @@ Background:
         | 2           | 4  | Apple Watch    | 5        | 130   |
         | 3           | 5  | iPad           | 7        | 150   |
         | 3           | 6  | Apple Belt     | 9        | 12    |
+
+Scenario: The server is running
+    When I visit the "Home Page"
+    Then I should see "Pet Demo RESTful Service" in the title
+    And I should not see "404 Not Found"
