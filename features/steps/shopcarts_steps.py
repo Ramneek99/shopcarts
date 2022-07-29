@@ -11,6 +11,7 @@ from behave import given
 from compare import expect
 import logging
 
+
 @given('the following shopcarts')
 def step_impl(context):
     """ Delete all shopcarts and load new ones """
@@ -28,7 +29,6 @@ def step_impl(context):
             expect(context.resp.status_code).to_equal(200)
             context.resp = requests.delete(f"{rest_endpoint}/{customer_id}")
             expect(context.resp.status_code).to_equal(204)
-
 
     # load the database with new pets
     customer_id_set = set()
@@ -55,5 +55,3 @@ def step_impl(context):
     context.resp = requests.get(rest_endpoint)
     for shopcart in context.resp.json():
         logging.info(shopcart)
-
-        

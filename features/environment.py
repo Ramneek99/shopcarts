@@ -2,9 +2,7 @@
 Environment for Behave Testing
 """
 from os import getenv
-from webbrowser import Chrome
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
 BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
