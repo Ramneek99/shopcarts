@@ -257,16 +257,13 @@ def list_shopcarts():
 def clear_shopcarts(customer_id):
     """Clear a shop cart according to customer id"""
     app.logger.info("Request to clear shop cart for customer id: %s", (customer_id))
-    check_content_type("application/json")
-
+    # check_content_type("application/json")
     shopcart = Shopcart.find_by_customer_id(customer_id)
     if not shopcart:
         abort(
             status.HTTP_404_NOT_FOUND,
             f"Shopcart with id '{customer_id}' could not be found.",
         )
-
-    shopcart.deserialize(request.get_json())
     for product in shopcart.products:
         product.delete()
     shopcart.products = []

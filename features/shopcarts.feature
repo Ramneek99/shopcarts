@@ -15,5 +15,5 @@ Background:
 
 Scenario: The server is running
     When I visit the "Home Page"
-    Then I should see "Pet Demo RESTful Service" in the title
+    Then I should see "Shop Cart Demo RESTful Service" in the title
     And I should not see "404 Not Found"

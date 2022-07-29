@@ -24,7 +24,7 @@ def step_impl(context):
         customer_id = shopcart["customer_id"]
         if customer_id not in customer_id_set:
             customer_id_set.add(customer_id)
-            context.resp = requests.put(f"{rest_endpoint}/{customer_id}/clear")
+            context.resp = requests.put(f"{rest_endpoint}/{customer_id}/clear", json={})
             expect(context.resp.status_code).to_equal(200)
             context.resp = requests.delete(f"{rest_endpoint}/{customer_id}")
             expect(context.resp.status_code).to_equal(204)
@@ -46,7 +46,8 @@ def step_impl(context):
             "id": row["id"],
             "name": row["name"],
             "quantity": row["quantity"],
-            "price": row["price"]
+            "price": row["price"],
+            "shopcart_id": customer_id
         }
         context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload)
         expect(context.resp.status_code).to_equal(201)
