@@ -25,5 +25,13 @@
 		"bbenoist.vagrant",
 		"ms-python.pylint"
 	],
-	"postCreateCommand": "sudo pip install -r requirements.txt"
+	"postCreateCommand": "sudo pip install -r requirements.txt",
+	"features": {
+		"docker-in-docker": "latest",
+		"kubectl-helm-minikube": {
+			"version": "latest",
+			"helm": "latest",
+			"minikube": "none"
+		}
+	}
 }
