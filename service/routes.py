@@ -259,8 +259,6 @@ def clear_shopcarts(id):
             status.HTTP_404_NOT_FOUND,
             f"Shopcart with id '{id}' could not be found.",
         )
-
-    shopcart.deserialize(request.get_json())
     for product in shopcart.products:
         product.delete()
     shopcart.products = []

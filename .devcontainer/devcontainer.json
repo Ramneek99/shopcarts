@@ -6,6 +6,7 @@
 	"remoteUser": "devops",
 	"extensions": [
 		"VisualStudioExptTeam.vscodeintellicode",
+		"VisualStudioExptTeam.intellicode-api-usage-examples",
 		"ms-python.python",
 		"ms-python.vscode-pylance",
 		"alexkrechik.cucumberautocomplete",
@@ -23,7 +24,16 @@
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
 		"bbenoist.vagrant",
-		"ms-python.pylint"
+		"ms-python.pylint",
+		"blodwynn.featurehighlight"
 	],
-	"postCreateCommand": "sudo pip install -r requirements.txt"
+	"postCreateCommand": "sudo pip install -r requirements.txt",
+	"features": {
+		"docker-in-docker": "latest",
+		"kubectl-helm-minikube": {
+			"version": "latest",
+			"helm": "latest",
+			"minikube": "none"
+		}
+	}
 }
