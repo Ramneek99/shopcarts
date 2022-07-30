@@ -6,21 +6,21 @@ $(function () {
 
     // Updates the form with data from the response
     function update_product_form_data(res){
-        $("#customer_id").val(res.shopcart_id);
-        $("#product_id").val(res.id);
-        $("#product_name").val(res.name);
-        $("#product_quantity").val(res.quantity);
-        $("#product_price").val(res.price);
+        $("#shopcarts_customer_id").val(res.shopcart_id);
+        $("#shopcarts_product_id").val(res.id);
+        $("#shopcarts_product_name").val(res.name);
+        $("#shopcarts_product_quantity").val(res.quantity);
+        $("#shopcarts_product_price").val(res.price);
     }
     function update_shopcart_form_data(res){
-        $("#customer_id").val(res.customer_id);
+        $("#shopcarts_customer_id").val(res.customer_id);
     }
     /// Clears all form fields
     function clear_form_data() {
-        $("#product_id").val("");
-        $("#product_name").val("");
-        $("#product_quantity").val("");
-        $("#product_price").val("");
+        $("#shopcarts_product_id").val("");
+        $("#shopcarts_product_name").val("");
+        $("#shopcarts_product_quantity").val("");
+        $("#shopcarts_product_price").val("");
     }
 
     // Updates the flash message area
@@ -35,7 +35,7 @@ $(function () {
 
     $("#create-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
 
         let data = {
             "customer_id": customer_id,
@@ -67,7 +67,7 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
 
         $("#flash_message").empty();
 
@@ -96,7 +96,7 @@ $(function () {
  
     $("#list-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
 
         $("#flash_message").empty();
 
@@ -148,7 +148,7 @@ $(function () {
 
     $("#clear-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
         let data = {
             "customer_id": customer_id,
             "products":[]
@@ -179,7 +179,7 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
 
         $("#flash_message").empty();
 
@@ -205,7 +205,7 @@ $(function () {
     // ****************************************
 
     $("#clear-form-btn").click(function () {
-        $("#customer_id").val("");
+        $("#shopcarts_customer_id").val("");
         $("#flash_message").empty();
         clear_form_data()
     });
@@ -216,10 +216,10 @@ $(function () {
  
     $("#add-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
-        let price = $("#product_price").val();
-        let quantity = $("#product_quantity").val();
-        let name = $("#product_name").val();
+        let customer_id = $("#shopcarts_customer_id").val();
+        let price = $("#shopcarts_product_price").val();
+        let quantity = $("#shopcarts_product_quantity").val();
+        let name = $("#shopcarts_product_name").val();
 
         $("#flash_message").empty();
 
@@ -254,8 +254,8 @@ $(function () {
  
     $("#delete-product-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
-        let product_id = $("#product_id").val();
+        let customer_id = $("#shopcarts_customer_id").val();
+        let product_id = $("#shopcarts_product_id").val();
 
 
         $("#flash_message").empty();
@@ -284,11 +284,11 @@ $(function () {
  
     $("#update-btn").click(function () {
 
-        let customer_id = $("#customer_id").val();
-        let product_id = $("#product_id").val();
-        let price = $("#product_price").val();
-        let quantity = $("#product_quantity").val();
-        let name = $("#product_name").val();
+        let customer_id = $("#shopcarts_customer_id").val();
+        let product_id = $("#shopcarts_product_id").val();
+        let price = $("#shopcarts_product_price").val();
+        let quantity = $("#shopcarts_product_quantity").val();
+        let name = $("#shopcarts_product_name").val();
 
         $("#flash_message").empty();
 
@@ -326,7 +326,7 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        let name = $("#product_name").val();
+        let name = $("#shopcarts_product_name").val();
 
         if (!name) {
             flash_message("Name needed")

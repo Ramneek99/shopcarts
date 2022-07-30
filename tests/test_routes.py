@@ -334,7 +334,6 @@ class TestShopcartService(TestCase):
         # clear the shopcart
         resp = self.client.put(
             f"{BASE_URL}/{test_shopcart.customer_id}/clear",
-            json=test_shopcart.serialize(),
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_shopcart = resp.get_json()
