@@ -22,7 +22,7 @@ def step_impl(context):
     customer_id_set = set()
     # delete all shopcarts and products
     for shopcart in context.resp.json():
-        customer_id = shopcart["customer_id"]
+        customer_id = shopcart["id"]
         if customer_id not in customer_id_set:
             customer_id_set.add(customer_id)
             context.resp = requests.put(f"{rest_endpoint}/{customer_id}/clear", json={})
