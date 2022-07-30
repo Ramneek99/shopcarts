@@ -39,3 +39,33 @@ Scenario: Add a Product
     And I should see "Water" in the results
     And I should see "Apple Watch" in the results
     And I should see "Macbook Pro" in the results
+
+Scenario: Delete a Product
+    When I visit the "Home Page"
+    And I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should see "Apple Watch" in the results
+    And I should see "Macbook Pro" in the results
+    When I copy the "Product ID" field
+    And I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I paste the "Product ID" field
+    And I set the "Customer ID" to "1"
+    And I press the "Delete-Product" button
+    Then I should see the message "Product has been Deleted!"
+    When I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should see "Macbook Pro" in the results
+
