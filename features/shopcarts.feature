@@ -5,7 +5,7 @@ Feature: The shopcarts service back-end
 
 Background:
     Given the following shopcarts 
-        | shopcart_id | id | name           | quantity | price |
+        | customer_id | id | name           | quantity | price |
         | 1           | 1  | Apple Watch    | 1        | 100   |
         | 1           | 2  | Macbook Pro    | 15       | 520   |
         | 2           | 3  | iPhone13       | 14       | 250   |
