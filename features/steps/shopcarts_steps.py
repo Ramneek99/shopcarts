@@ -37,7 +37,7 @@ def step_impl(context):
         if customer_id not in customer_id_set:
             customer_id_set.add(customer_id)
             shopcart_payload = {
-                "customer_id": customer_id,
+                "id": customer_id,
                 "products": []
             }
             context.resp = requests.post(f"{rest_endpoint}/{customer_id}", json=shopcart_payload)
