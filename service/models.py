@@ -14,6 +14,7 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
+
     pass
 
 
@@ -57,9 +58,7 @@ class Product(db.Model, PersistentBase):
     name = db.Column(db.String(260), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    shopcart_id = db.Column(
-        db.Integer, db.ForeignKey("shopcart.customer_id"), nullable=False
-    )
+    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
 
     @classmethod
     def find(cls, by_id):
@@ -148,39 +147,39 @@ class Shopcart(db.Model, PersistentBase):
     app = None
 
     # Table Schema
-    customer_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     products = db.relationship("Product", backref="shopcart", passive_deletes=True)
 
     def __repr__(self):
-        return "<Shopcart %r id=[%s]>" % (self.customer_id, self.customer_id)
+        return "<Shopcart %r id=[%s]>" % (self.id, self.id)
 
     def update(self):
         """
         Updates a Shopcart to the database
         """
-        logger.info("Updating %s", self.customer_id)
+        logger.info("Updating %s", self.id)
         db.session.commit()
 
     def delete(self):
         """Removes a Shopcart from the data store"""
-        logger.info("Deleting %s", self.customer_id)
+        logger.info("Deleting %s", self.id)
         deletedCnt = db.session.delete(self)
         db.session.commit()
         return deletedCnt
 
-    def create(self, customer_id):
+    def create(self, id):
         """
         Creates a Shopcart to the database
         """
-        logger.info("Creating %s", customer_id)
-        self.customer_id = customer_id  # id must be none to generate next primary key
+        logger.info("Creating %s", id)
+        self.id = id  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
     def serialize(self):
         """Serializes a Shopcart into a dictionary"""
         shopcart = {
-            "customer_id": self.customer_id,
+            "id": self.id,
             "products": [],
         }
         for product in self.products:
@@ -194,13 +193,18 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.customer_id = data["customer_id"]
+            self.id = data["id"]
             # handle inner list of products
             product_list = data.get("products")
+            if product_list:
+                for product in self.products:
+                    product.delete()
             for json_product in product_list:
                 product = Product()
                 product.deserialize(json_product)
+                product.shopcart_id = self.id
                 self.products.append(product)
+            self.update()
         except KeyError as error:
             raise DataValidationError("Invalid Shopcart: missing " + error.args[0])
         except TypeError as error:
@@ -215,13 +219,15 @@ class Shopcart(db.Model, PersistentBase):
         """Returns Shopcarts which has the give product_name"""
         logger.info("Product name is: %s", product_name)
         selected_products = Product.filter_by_product_name(product_name)
-        return [Shopcart.find_by_customer_id(product.shopcart_id) for product in selected_products]
+        return [
+            Shopcart.find_by_id(product.shopcart_id) for product in selected_products
+        ]
 
     @classmethod
-    def find_by_customer_id(cls, customer_id):
+    def find_by_id(cls, id):
         """Returns the Shopcart with the given customer id
         Args:
-            customer_id (Integer): the id of the customer you want to match
+            id (Integer): the id of the customer you want to match
         """
-        logger.info("Processing id query for %s ...", customer_id)
-        return cls.query.filter(cls.customer_id == customer_id).first()
+        logger.info("Processing id query for %s ...", id)
+        return cls.query.filter(cls.id == id).first()
