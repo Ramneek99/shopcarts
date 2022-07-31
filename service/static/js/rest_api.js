@@ -464,7 +464,7 @@ $("#list-shopcart-btn").click(function () {
         let firstCart = "";
         for(let i = 0; i < res.length; i++) {
             let cart = res[i];
-            table +=  `<tr id="row_${i}"><td>${cart.customer_id}</td></tr>`;
+            table +=  `<tr id="row_${i}"><td>${cart.id}</td></tr>`;
             if (i == 0) {
                 firstCart = cart;
             }
