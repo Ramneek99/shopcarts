@@ -109,7 +109,7 @@ $(function () {
          
         ajax.done(function(res){
             //alert(res.toSource())
-            $("#list_results").empty();
+            $("#search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
             table += '<th class="col-md-2">ID</th>'
@@ -126,11 +126,11 @@ $(function () {
                 }
             }
             table += '</tbody></table>';
-            $("#list_results").append(table);
+            $("#search_results").append(table);
 
                     // copy the first result to the form
-            if (firstPet != "") {
-                update_form_data(firstPet)
+            if (firstProduct != "") {
+                update_product_form_data(firstProduct)
             }
         
                 flash_message("Success")
@@ -335,20 +335,21 @@ $(function () {
         $("#flash_message").empty();
 
 
-        //let data2 = {
-        //    "shopcart_id": customer_id,
-        //    "name":name,
-        //    "price":price,
-        //    "quantity":quantity,
-        //};
+        let data2 = {
+            "shopcart_id": id,
+            "name":name,
+            "price":price,
+            "quantity":quantity,
+        };
 
         let data1 = {
-            "id": customer_id,
-            "products": [],
+            "id": id,
+            "products": [data2],
         }
+
         let ajax = $.ajax({
             type: "PUT",
-            url: `/shopcarts/${customer_id}`,
+            url: `/shopcarts/${id}`,
             contentType: "application/json",
             data: JSON.stringify(data1),
         })
@@ -414,10 +415,10 @@ $(function () {
             table += '</tr></thead><tbody>'
             let firstProduct = "";
             for(let i = 0; i < res.length; i++) {
-                let product = res[i];
-                table +=  `<tr id="row_${i}"><td>${product.id}</td><td>${name}</td></tr>`;
+                let cart = res[i];
+                table +=  `<tr id="row_${i}"><td>${cart.customer_id}</td><td>${name}</td></tr>`;
                 if (i == 0) {
-                    firstProduct = product;
+                    firstProduct = cart;
                 }
             }
             table += '</tbody></table>';
@@ -425,7 +426,7 @@ $(function () {
 
             // copy the first result to the form
             if (firstProduct != "") {
-                update_product_form_data(firstProduct)
+                update_shopcart_form_data(firstProduct)
             }
 
             flash_message("Success")
@@ -438,3 +439,51 @@ $(function () {
     });
 
 })
+// ****************************************
+// List All Shop Cart
+// ****************************************
+
+$("#list-shopcart-btn").click(function () {
+
+    $("#flash_message").empty();
+
+    let ajax = $.ajax({
+        type: "GET",
+        url: `/shopcarts`,
+        contentType: "application/json",
+        data: ''
+    })
+
+    ajax.done(function(res){
+        //alert(res.toSource())
+        $("#search_results").empty();
+        let table = '<table class="table table-striped" cellpadding="10">'
+        table += '<thead><tr>'
+        table += '<th class="col-md-2">ID</th>'
+        table += '</tr></thead><tbody>'
+        let firstCart = "";
+        for(let i = 0; i < res.length; i++) {
+            let cart = res[i];
+            table +=  `<tr id="row_${i}"><td>${cart.customer_id}</td></tr>`;
+            if (i == 0) {
+                firstCart = cart;
+            }
+        }
+        table += '</tbody></table>';
+        $("#search_results").append(table);
+
+        // copy the first result to the form
+        if (firstProduct != "") {
+            update_shopcart_form_data(firstProduct)
+        }
+
+        flash_message("Success")
+    });
+
+    ajax.fail(function(res){
+        flash_message(res.responseJSON.message)
+    });
+
+});
+
+

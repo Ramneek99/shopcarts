@@ -21,6 +21,11 @@ RUN curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 RUN curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
 
+# Install K3D, Kustomize, & IBM Cloud CLI for Kubernetes
+RUN curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
+RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+RUN curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+
 # Add chromedriver directory to environment variable PATH
 ENV PATH=$PATH:/chromedriver/
 
