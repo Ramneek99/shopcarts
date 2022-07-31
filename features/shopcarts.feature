@@ -91,3 +91,9 @@ Scenario: Update a Product
     Then I should see the message "Success"
     And I should see "Milk" in the results
     And I should see "Macbook Pro" in the results
+
+Scenario: Retrieve a Shop Cart
+    When I set the "Customer ID" to "1"
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "1" in the "Customer ID" field
