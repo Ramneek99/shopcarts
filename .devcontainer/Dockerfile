@@ -26,6 +26,9 @@ RUN curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh"
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 RUN curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
 
+# Add chromedriver directory to environment variable PATH
+ENV PATH=$PATH:/chromedriver/
+
 # Create a user for development
 ARG USERNAME=devops
 ARG USER_UID=1000
