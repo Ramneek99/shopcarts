@@ -163,6 +163,10 @@ class Shopcart(db.Model, PersistentBase):
     def delete(self):
         """Removes a Shopcart from the data store"""
         logger.info("Deleting %s", self.id)
+        if self.products:
+            logger.info("delete")
+            for product in self.products:
+                product.delete()
         deletedCnt = db.session.delete(self)
         db.session.commit()
         return deletedCnt
