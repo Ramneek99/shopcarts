@@ -152,6 +152,67 @@ Scenario: Search by Product Name
     And I press the "Search" button
     Then I should see the message "Success"
 
+Scenario: Create Shopcart
+    When I visit the "Home Page"
+    And I set the "Customer ID" to "1"
+    And I press the "Create" button
+    Then I should see the message "409 Conflict: Shopcart 1 already exists"
+    When I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I set the "Customer ID" to "4"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I press the "List-Shopcart" button
+    Then I should see the message "Success"
+    And I should see "4" in the results
+
+Scenario: Clear Shopcart
+    When I visit the "Home Page"
+    And I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see "Apple Watch" in the results
+    And I should see "Macbook Pro" in the results
+    When I press the "Clear" button
+    Then I should see the message "Success"
+    When I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should not see "Apple Watch" in the results
+    And I should not see "Macbook Pro" in the results
+
+Scenario: List Shopcarts
+    When I visit the "Home Page"
+    And I press the "List-Shopcart" button
+    Then I should see "1" in the results
+    Then I should see "2" in the results
+    Then I should see "3" in the results
+
+Scenario: Read Shopcart
+    When I visit the "Home Page"
+    And I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should see "Apple Watch" in the results
+    And I should see "Macbook Pro" in the results
+
+Scenario: Search by Product Name
+    When I visit the "Home Page"
+    And I set the "Product Name" to "Apple Watch"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "1" in the results
+    And I should see "2" in the results
+
 Scenario: Retrieve a Shop Cart
     When I set the "Customer ID" to "1"
     And I press the "Retrieve" button
