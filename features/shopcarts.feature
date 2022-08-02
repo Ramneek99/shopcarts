@@ -158,3 +158,42 @@ Scenario: Retrieve a Shop Cart
     And I press the "Retrieve" button
     Then I should see the message "Success"
     And I should see "1" in the "Customer ID" field
+
+
+Scenario: Delete Shopcart
+    When I set the "Customer ID" to "1"
+    And I press the "Delete" button
+    Then I should see the message "Shop Cart has been Deleted!"
+    When I press the "List-Shopcart" button
+    Then I should not see "1" in the results
+    And I should see "2" in the results
+    And I should see "3" in the results
+
+Scenario: Update Shopcart
+    When I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see "Apple Watch" in the results
+    And I should see "Macbook Pro" in the results
+    When I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I set the "Customer ID" to "1"
+    And I set the "Product Name" to "Milk"
+    And I set the "Product Quantity" to "2"
+    And I set the "Product Price" to "2.75"
+    And I press the "Update-Shopcart" button
+    Then I should see the message "Success"
+    When I press the "Clear-Form" button
+    Then the "Product ID" field should be empty 
+    And the "Product Name" field should be empty
+    And the "Product Price" field should be empty
+    And the "Product Quantity" field should be empty
+    And the "Customer ID" field should be empty
+    When I set the "Customer ID" to "1"
+    And I press the "List" button
+    Then I should see "Milk" in the results
+    And I should not see "Apple Watch" in the results
+    And I should not see "Macbook Pro" in the results
