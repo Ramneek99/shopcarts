@@ -90,7 +90,7 @@ Scenario: Update a Product
     And I press the "List" button
     Then I should see the message "Success"
     And I should see "Milk" in the results
-    And I should see "Macbook Pro" in the result
+    And I should see "Macbook Pro" in the results
 
 Scenario: Create Shopcart
     When I visit the "Home Page"
@@ -151,9 +151,21 @@ Scenario: Search by Product Name
     And I set the "Product Name" to "Apple Watch"
     And I press the "Search" button
     Then I should see the message "Success"
+    Then I should see "Apple Watch" in the results
+    When I set the "Product Name" to "Squash"
+    And I press the "Search" button
+    Then I should see the message "Success"
 
 Scenario: Retrieve a Shop Cart
     When I set the "Customer ID" to "1"
     And I press the "Retrieve" button
     Then I should see the message "Success"
     And I should see "1" in the "Customer ID" field
+
+Scenario: Delete Shopcart
+    When I set the "Customer ID" to "1"
+    And I press the "Delete" button
+    Then I should see the message "Shop Cart has been Deleted!"
+    When I set the "Customer ID" to "7"
+    And I press the "Delete" button
+    Then I should see the message "Shop Cart has been Deleted!"
