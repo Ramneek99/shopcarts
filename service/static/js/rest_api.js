@@ -398,7 +398,7 @@ $(function () {
             let firstProduct = "";
             for(let i = 0; i < res.length; i++) {
                 let cart = res[i];
-                table +=  `<tr id="row_${i}"><td>${cart.customer_id}</td><td>${name}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${cart.id}</td><td>${name}</td></tr>`;
                 if (i == 0) {
                     firstProduct = cart;
                 }
@@ -420,7 +420,7 @@ $(function () {
 
     });
 
-})
+
 // ****************************************
 // List All Shop Cart
 // ****************************************
@@ -443,20 +443,19 @@ $("#list-shopcart-btn").click(function () {
         table += '<thead><tr>'
         table += '<th class="col-md-2">ID</th>'
         table += '</tr></thead><tbody>'
-        let firstCart = "";
+        let firstProduct = "";
         for(let i = 0; i < res.length; i++) {
             let cart = res[i];
             table +=  `<tr id="row_${i}"><td>${cart.id}</td></tr>`;
             if (i == 0) {
-                firstCart = cart;
+                firstProduct = cart;
             }
         }
         table += '</tbody></table>';
         $("#search_results").append(table);
-
         // copy the first result to the form
         if (firstProduct != "") {
-            update_shopcart_form_data(firstProduct)
+            update_shopcart_form_data(firstProduct);
         }
 
         flash_message("Success")
@@ -468,4 +467,5 @@ $("#list-shopcart-btn").click(function () {
 
 });
 
+})
 
