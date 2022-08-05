@@ -161,7 +161,8 @@ Scenario: Retrieve a Shop Cart
 
 
 Scenario: Delete Shopcart
-    When I set the "Customer ID" to "1"
+    When I visit the "Home Page"
+    And I set the "Customer ID" to "1"
     And I press the "Delete" button
     Then I should see the message "Shop Cart has been Deleted!"
     When I press the "List-Shopcart" button
