@@ -17,7 +17,8 @@ def step_impl(context):
     """ Delete all shopcarts and load new ones """
     # List all of the pets and delete them one by one
     rest_endpoint = f"{context.BASE_URL}/shopcarts"
-    context.resp = requests.get(rest_endpoint)
+    headers = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en"}
+    context.resp = requests.get(rest_endpoint, headers=headers)
     expect(context.resp.status_code).to_equal(200)
     customer_id_set = set()
     # delete all shopcarts and products
@@ -25,12 +26,12 @@ def step_impl(context):
         customer_id = shopcart["id"]
         if customer_id not in customer_id_set:
             customer_id_set.add(customer_id)
-            context.resp = requests.put(f"{rest_endpoint}/{customer_id}/clear", json={})
+            context.resp = requests.put(f"{rest_endpoint}/{customer_id}/clear", json={}, headers=headers)
             expect(context.resp.status_code).to_equal(200)
-            context.resp = requests.delete(f"{rest_endpoint}/{customer_id}")
+            context.resp = requests.delete(f"{rest_endpoint}/{customer_id}", headers=headers)
             expect(context.resp.status_code).to_equal(204)
 
-    # load the database with new pets
+    # load the database with new shopcarts
     customer_id_set = set()
     for row in context.table:
         customer_id = row["customer_id"]
@@ -40,7 +41,7 @@ def step_impl(context):
                 "id": customer_id,
                 "products": []
             }
-            context.resp = requests.post(f"{rest_endpoint}/{customer_id}", json=shopcart_payload)
+            context.resp = requests.post(f"{rest_endpoint}/{customer_id}", json=shopcart_payload, headers=headers)
             expect(context.resp.status_code).to_equal(201)
         product_payload = {
             "id": row["id"],
@@ -49,7 +50,7 @@ def step_impl(context):
             "price": row["price"],
             "shopcart_id": customer_id
         }
-        context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload)
+        context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
     rest_endpoint = f"{context.BASE_URL}/shopcarts"
     context.resp = requests.get(rest_endpoint)
