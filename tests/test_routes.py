@@ -55,7 +55,7 @@ class TestShopcartService(TestCase):
         db.session.query(Product).delete()
         db.session.query(Shopcart).delete()  # clean up the last tests
         db.session.commit()
-        self.app = app.test_client()
+        self.client = app.test_client()
 
 
     def tearDown(self):
@@ -71,7 +71,7 @@ class TestShopcartService(TestCase):
         shopcarts = []
         for _ in range(count):
             shopcart = ShopCartFactory()
-            resp = self.app.post(
+            resp = self.client.post(
                 f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize(),content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
@@ -88,7 +88,7 @@ class TestShopcartService(TestCase):
         """Factory method to find shopcarts in bulk"""
         rst = []
         for shopcart in shopcarts:
-            resp = self.app.get(
+            resp = self.client.get(
                 f"{BASE_URL}/{shopcart.id}", content_type="application/json"
             )
             rst.append(shopcart.deserialize(resp.get_json()))
@@ -100,14 +100,14 @@ class TestShopcartService(TestCase):
 
     def test_index(self):
         """It should call the Home Page"""
-        resp = self.app.get("/")
+        resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_get_shopcart(self):
         """It should Read a single Shopcart"""
         # get the id of an shopcart
         shopcart = self._create_shopcarts(1)[0]
-        resp = self.app.get(
+        resp = self.client.get(
             f"{BASE_URL}/{shopcart.id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -116,13 +116,13 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart_not_found(self):
         """It should not Read a shopcart that is not found"""
-        resp = self.app.get(f"{BASE_URL}/0")
+        resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
         shopcart = ShopCartFactory()
-        resp = self.app.post(
+        resp = self.client.post(
             f"{BASE_URL}/{shopcart.id}",
             json=shopcart.serialize(),
             content_type="application/json"
@@ -141,14 +141,14 @@ class TestShopcartService(TestCase):
         )
 
         # Check that the location header was correct by getting it
-        resp = self.app.get(location, content_type="application/json")
+        resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["id"], shopcart.id, "Names does not match")
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
-        resp = self.app.post(
+        resp = self.client.post(
             f"{BASE_URL}/{shopcart.id}",
             json=shopcart.serialize(),
             content_type="application/json",
