@@ -44,7 +44,6 @@ class PersistentBase:
         logger.info("Processing all records")
         return cls.query.all()
 
-
 ######################################################################
 #  P R O D U C T   M O D E L
 ######################################################################

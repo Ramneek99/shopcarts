@@ -1,33 +1,155 @@
+# spell: ignore Rofrano jsonify restx dbname
 """
-My Service
-
-Describe what your service does here
+Pet Store Service with Swagger
+Paths:
+------
+GET / - Displays a UI for Selenium testing
+GET /pets - Returns a list all of the Pets
+GET /pets/{id} - Returns the Pet with a given id number
+POST /pets - creates a new Pet record in the database
+PUT /pets/{id} - updates a Pet record in the database
+DELETE /pets/{id} - deletes a Pet record in the database
 """
 
-from flask import jsonify, request, url_for, abort, make_response
-
-# , Flask
-from .utils import status  # HTTP Status Codes
-from service.models import Shopcart, Product
-
-# Import Flask application
-from . import app
-
+import sys
+import secrets
 import logging
-
+from functools import wraps
+from flask import jsonify, request, url_for, make_response, render_template,abort
+from flask_restx import Api, Resource, fields, reqparse, inputs
+from service.models import Product, Shopcart
+from service.utils import error_handlers, status    # HTTP Status Codes
+from . import app, api
 
 ######################################################################
-# GET INDEX
+# Configure the Root route before OpenAPI
 ######################################################################
-@app.route("/")
+@app.route('/')
 def index():
-    """Base URL for our service"""
-    return app.send_static_file("index.html")
+    """ Index page """
+    return app.send_static_file('index.html')
 
+create_model = api.model('Product', {
+    'name': fields.String(required=True,
+                          description='The name of the Product'),
+    'quantity': fields.Float(required=True,
+                              description='The quantity of the Product'),
+    'price': fields.Float(required=True,
+                                description='The price of the Product'),
+    'shopcart_id': fields.Integer(required=True, description='The shop cart id of the product')
+})
+
+product_model = api.inherit(
+    'ProductModel', 
+    create_model,
+    {
+        '_id': fields.String(readOnly=True,
+                            description='The unique id assigned internally by service'),
+    }
+)
+shopcart_model = api.model('ShopcartModel',{
+    'id': fields.Integer(required=True, description='The id of the customer'),
+    'products': fields.List(fields.Nested(product_model,required=True),required=True, 
+                                description='The list of products in the shop cart')
+})
+
+######################################################################
+#  PATH: /shopcarts/{id}
+######################################################################
+@api.route('/shopcarts/<id>')
+@api.param('id', 'The Shop Cart identifier')
+class ShopCartResource(Resource):
+    """
+    ShopCartResource class
+    Allows the manipulation of a single Shop Cart
+    GET /shopcart{id} - Returns a Shop Cart with the id
+    PUT /shopcart{id} - Update a Shop Cart with the id
+    DELETE /shopcart{id} -  Deletes a Shop Cart with the id
+    POST /shopcart{id} -  Create a Shop Cart with the id
+    """
+
+    #------------------------------------------------------------------
+    # RETRIEVE A Shop Cart
+    #------------------------------------------------------------------
+    @api.doc('get_shopcarts')
+    @api.response(404, 'Shop Cart not found')
+    @api.marshal_with(shopcart_model)
+    def get(self, id):
+        """
+        Retrieve a single Shop Cart
+        This endpoint will return a Shop Cart based on it's id
+        """
+        app.logger.info("Request to Retrieve a shop cart with id [%s]", id)
+        shopcart = Shopcart.find_by_id(id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "Shop Cart with id '{}' was not found.".format(id))
+        return shopcart.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING Shop Cart
+    #------------------------------------------------------------------
+    @api.doc('update_shopcarts')
+    @api.response(404, 'Shop Cart not found')
+    @api.response(400, 'The posted Shop Cart data was not valid')
+    @api.expect(shopcart_model)
+    @api.marshal_with(shopcart_model)
+    def put(self, id):
+        """
+        Update a Shop Cart
+        This endpoint will update a Shop Cart based the body that is posted
+        """
+        app.logger.info('Request to Update a Shop Cart with id [%s]', id)
+        shopcart = Shopcart.find_by_id(id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "Shop Cart with id '{}' was not found.".format(id))
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        shopcart.deserialize(data)
+        shopcart.id = id
+        shopcart.update()
+        return shopcart.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # DELETE A Shop Cart
+    #------------------------------------------------------------------
+    @api.doc('delete_shopcarts')
+    @api.response(204, 'Shop Cart deleted')
+    def delete(self, id):
+        """
+        Delete a Shop Cart
+        This endpoint will delete a Shop Cart based the id specified in the path
+        """
+        app.logger.info('Request to Delete a pet with id [%s]', id)
+        shopcart = Shopcart.find_by_id(id)
+        if shopcart:
+            shopcart.delete()
+            app.logger.info('Shop Cart with id [%s] was deleted', id)
+        return '', status.HTTP_204_NO_CONTENT
+    #------------------------------------------------------------------
+    # Create A NEW Shop Cart
+    #------------------------------------------------------------------
+    @api.doc('create_shopcarts')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(shopcart_model)
+    @api.marshal_with(shopcart_model, code=201)
+    def post(self,id):
+        """
+        Creates a Shop Cart
+        This endpoint will create a Shop Cart based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Shop Cart')
+        shopcart = Shopcart()
+        app.logger.debug('Payload = %s', api.payload)
+        shopcart.deserialize(api.payload)
+        shopcart.create(id)
+        app.logger.info('shopcart with new id [%s] created!', id)
+        location_url = url_for('get',id=shopcart.id)
+        return shopcart.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
 # RETRIEVE A SHOP CART
 ######################################################################
+'''
 @app.route("/shopcarts/<int:id>", methods=["GET"])
 def get_shopcarts(id):
     """
@@ -109,7 +231,7 @@ def create_shopcarts(id):
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
-
+'''
 
 ######################################################################
 # LIST ALL PRODUCTS OF A GIVEN SHOP CART
@@ -298,8 +420,6 @@ def check_content_type(media_type):
         "Content-Type must be {}".format(media_type),
     )
 
-
 def init_db():
-    """Initializes the SQLAlchemy app"""
-    global app
+    """ Initialize the model """
     Shopcart.init_db(app)

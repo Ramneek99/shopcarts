@@ -14,17 +14,20 @@ from mockito import mock
 import requests
 
 # from unittest.mock import MagicMock, patch
-from service import app
+from service import app, routes
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
-
+logging.disable(logging.CRITICAL)
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/shopcarts"
+
+BASE_URL = "api/shopcarts"
 PRODUCT_URL = "/product"
+
+CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -40,7 +43,7 @@ class TestShopcartService(TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        Shopcart.init_db(app)
+        routes.init_db()
 
     @classmethod
     def tearDownClass(cls):
@@ -52,8 +55,8 @@ class TestShopcartService(TestCase):
         db.session.query(Product).delete()
         db.session.query(Shopcart).delete()  # clean up the last tests
         db.session.commit()
+        self.app = app.test_client()
 
-        self.client = app.test_client()
 
     def tearDown(self):
         """Runs once after each test case"""
@@ -63,13 +66,13 @@ class TestShopcartService(TestCase):
     #  H E L P E R   M E T H O D S
     ######################################################################
 
-    def _create_shopcarts(self, count):
+    def _create_shopcarts(self, count: int = 1) -> list:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
         for _ in range(count):
             shopcart = ShopCartFactory()
-            resp = self.client.post(
-                f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize()
+            resp = self.app.post(
+                f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize(),content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
                 resp.status_code,
@@ -85,7 +88,7 @@ class TestShopcartService(TestCase):
         """Factory method to find shopcarts in bulk"""
         rst = []
         for shopcart in shopcarts:
-            resp = self.client.get(
+            resp = self.app.get(
                 f"{BASE_URL}/{shopcart.id}", content_type="application/json"
             )
             rst.append(shopcart.deserialize(resp.get_json()))
@@ -97,14 +100,14 @@ class TestShopcartService(TestCase):
 
     def test_index(self):
         """It should call the Home Page"""
-        resp = self.client.get("/")
+        resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_get_shopcart(self):
         """It should Read a single Shopcart"""
         # get the id of an shopcart
         shopcart = self._create_shopcarts(1)[0]
-        resp = self.client.get(
+        resp = self.app.get(
             f"{BASE_URL}/{shopcart.id}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -113,16 +116,16 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart_not_found(self):
         """It should not Read a shopcart that is not found"""
-        resp = self.client.get(f"{BASE_URL}/0")
+        resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
         shopcart = ShopCartFactory()
-        resp = self.client.post(
+        resp = self.app.post(
             f"{BASE_URL}/{shopcart.id}",
             json=shopcart.serialize(),
-            content_type="application/json",
+            content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -138,14 +141,14 @@ class TestShopcartService(TestCase):
         )
 
         # Check that the location header was correct by getting it
-        resp = self.client.get(location, content_type="application/json")
+        resp = self.app.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["id"], shopcart.id, "Names does not match")
         self.assertEqual(
             new_shopcart["products"], shopcart.products, "Address does not match"
         )
-        resp = self.client.post(
+        resp = self.app.post(
             f"{BASE_URL}/{shopcart.id}",
             json=shopcart.serialize(),
             content_type="application/json",
