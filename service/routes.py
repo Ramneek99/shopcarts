@@ -141,7 +141,12 @@ class ShopCartResource(Resource):
         shopcart = Shopcart()
         app.logger.debug('Payload = %s', api.payload)
         shopcart.deserialize(api.payload)
-        shopcart.create(id)
+        found_shop_cart = Shopcart.find_by_id(id)
+        logging.info("To create shopcart with id: %d", shopcart.id)
+        if found_shop_cart is not None:
+            logging.info("Found shopcart: %s", type(found_shop_cart))
+            abort(status.HTTP_409_CONFLICT, f"Shopcart {shopcart.id} already exists")
+        shopcart.create(id)  
         app.logger.info('shopcart with new id [%s] created!', id)
         location_url = api.url_for(ShopCartResource,id=shopcart.id,_external =True)
         return shopcart.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
