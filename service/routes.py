@@ -143,7 +143,7 @@ class ShopCartResource(Resource):
         shopcart.deserialize(api.payload)
         shopcart.create(id)
         app.logger.info('shopcart with new id [%s] created!', id)
-        location_url = url_for('get',id=shopcart.id)
+        location_url = api.url_for(ShopCartResource,id=shopcart.id,_external =True)
         return shopcart.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
