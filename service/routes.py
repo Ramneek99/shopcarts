@@ -43,7 +43,7 @@ product_model = api.inherit(
     'ProductModel', 
     create_model,
     {
-        '_id': fields.String(readOnly=True,
+        'id': fields.String(readOnly=True,
                             description='The unique id assigned internally by service'),
     }
 )
@@ -239,6 +239,114 @@ def create_shopcarts(id):
 '''
 
 ######################################################################
+#  PATH: /shopcarts/{id}/products/{product_id}
+######################################################################
+@api.route('/shopcarts/<id>/products/<product_id>')
+@api.param('id', 'The shop cart identifier')
+@api.param('product_id', 'The product identifier')
+class ProductResource(Resource):
+    #------------------------------------------------------------------
+    # RETRIEVE A Product
+    #------------------------------------------------------------------
+    @api.doc('get_products')
+    @api.response(404, 'Product not found')
+    @api.marshal_with(product_model)
+    def get(self, id,product_id):
+        """
+        Retrieve a single Product
+        This endpoint will return a Product based on it's id
+        """
+        app.logger.info("Request to Retrieve a Product with id [%s] for Customer with id [%s]", product_id,id)
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, "Product with id '{}' was not found.".format(product_id))
+        return product.serialize(), status.HTTP_200_OK
+    #------------------------------------------------------------------
+    # DELETE A Product
+    #------------------------------------------------------------------
+    @api.doc('delete_products')
+    @api.response(204, 'Product deleted')
+    def delete(self, id,product_id):
+        """
+        Delete a Product
+        This endpoint will delete a Product based the id specified in the path
+        """
+        app.logger.info('Request to Delete a Product with id [%s] for customer with id [%s]', product_id,id)
+        product = Product.find(product_id)
+        if product:
+            product.delete()
+            app.logger.info('Product with id [%s] was deleted', product_id)
+        return '', status.HTTP_204_NO_CONTENT
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING Product
+    #------------------------------------------------------------------
+    @api.doc('update_products')
+    @api.response(404, ' not found')
+    @api.response(400, 'The posted Product data was not valid')
+    @api.expect(product_model)
+    @api.marshal_with(product_model)
+    def put(self, id,product_id):
+        """
+        Update a Product
+        This endpoint will update a Product based the body that is posted
+        """
+        app.logger.info('Request to Update a Product with id [%s] for customer with id [%s]', product_id,id)
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, "Product with id '{}' was not found.".format(product_id))
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        product.deserialize(data)
+        product.id = product_id
+        product.update()
+        return product.serialize(), status.HTTP_200_OK
+######################################################################
+#  PATH: /shopcarts/{id}/products
+######################################################################
+@api.route('/shopcarts/<id>/products')
+@api.param('id', 'The shop cart identifier')
+class ProductOperation(Resource):
+    #------------------------------------------------------------------
+    # LIST ALL PETS
+    #------------------------------------------------------------------
+    @api.doc('list_products')
+    @api.marshal_with(shopcart_model)
+    def get(self,id):
+        """ Returns the list of products in the shopcart """
+        app.logger.info('Request to list Products...')
+        products = []
+        shopcart = Shopcart().find_by_id(id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "Shop Cart with id '{}' was not found.".format(id))
+        products = shopcart.products
+        results = [product.serialize() for product in products]
+        app.logger.info('[%s] Products returned', len(results))
+        return results, status.HTTP_200_OK
+    #------------------------------------------------------------------
+    # Add A NEW Product to the shopcart 
+    #------------------------------------------------------------------
+    @api.doc('add_products')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(product_model)
+    @api.marshal_with(product_model, code=201)
+    def post(self,id):
+        """
+        Creates a Product
+        This endpoint will create a Product and add it to the shopcart based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Product')
+        shopcart = Shopcart().find_by_id(id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "Shop Cart with id '{}' was not found.".format(id))
+        product = Product()
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        product.deserialize(data)
+        shopcart.products.append(product)
+        shopcart.update()
+        return product.serialize(), status.HTTP_201_CREATED
+'''
+######################################################################
 # LIST ALL PRODUCTS OF A GIVEN SHOP CART
 ######################################################################
 @app.route("/shopcarts/<int:id>/products", methods=["GET"])
@@ -254,7 +362,6 @@ def list_products(id):
         )
     results = [product.serialize() for product in shopcart.products]
     return make_response(jsonify(results), status.HTTP_200_OK)
-
 
 ######################################################################
 # RETRIEVE AN PRODUCT FROM SHOPCART
@@ -355,10 +462,30 @@ def update_products(id, product_id):
     product.update()
     return make_response(jsonify(product.serialize()), status.HTTP_200_OK)
 
-
+'''
 ######################################################################
-# LIST ALL SHOP CARTS
+#  PATH: /shopcarts
 ######################################################################
+@api.route('/shopcarts', strict_slashes=False)
+class ShopcartCollection(Resource):
+    #------------------------------------------------------------------
+    # LIST ALL Shop carts
+    #------------------------------------------------------------------
+    @api.doc('list_shopcarts')
+    @api.marshal_list_with(shopcart_model)
+    def get(self):
+        """Returns all of the Shopcarts"""
+        app.logger.info("Request for Shop Cart list")
+        id = request.args.get("id")
+        results = []
+        if id:
+            shopcarts = Shopcart.find_by_id(id)
+            results = [shopcarts.serialize()]
+        else:
+            shopcarts = Shopcart.all()
+            results = [shopcart.serialize() for shopcart in shopcarts]
+        return results, status.HTTP_200_OK
+'''
 @app.route("/shopcarts", methods=["GET"])
 def list_shopcarts():
     """Returns all of the Shopcarts"""
@@ -372,8 +499,37 @@ def list_shopcarts():
         shopcarts = Shopcart.all()
         results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-
+'''
+######################################################################
+#  PATH: /shopcarts/{id}/clear
+######################################################################
+@api.route('/shopcarts/<id>/clear')
+@api.param('id', 'The shop cart identifier')
+class ShopcartAction(Resource):
+    #------------------------------------------------------------------
+    # clear a shopcart
+    #------------------------------------------------------------------
+    @api.doc('update_shopcarts')
+    @api.response(404, 'Shop Cart not found')
+    @api.response(400, 'The posted Shop Cart data was not valid')
+    @api.expect(shopcart_model)
+    @api.marshal_with(shopcart_model)
+    def put(self, id):
+        """
+        Update a Shop Cart
+        This endpoint will update a Shop Cart based the body that is posted
+        """
+        app.logger.info('Request to Update a Shop Cart with id [%s]', id)
+        shopcart = Shopcart.find_by_id(id)
+        if not shopcart:
+            abort(status.HTTP_404_NOT_FOUND, "Shop Cart with id '{}' was not found.".format(id))
+        for product in shopcart.products:
+            product.delete()
+        shopcart.products = []
+        shopcart.id = id
+        shopcart.update()
+        return shopcart.serialize(), status.HTTP_200_OK 
+'''
 @app.route("/shopcarts/<int:id>/clear", methods=["PUT"])
 def clear_shopcarts(id):
     """Clear a shop cart according to customer id"""
@@ -393,7 +549,29 @@ def clear_shopcarts(id):
     shopcart.update()
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
+'''
 
+######################################################################
+#  PATH: /shopcarts/products/<name>
+######################################################################
+@api.route('/shopcarts/products/<name>')
+@api.param('name', 'The name of the product')
+class ShopcartQuery(Resource):
+    #------------------------------------------------------------------
+    # Filter and Get a list of shop carts 
+    #------------------------------------------------------------------
+    @api.doc('filter_shopcarts')
+    @api.marshal_list_with(shopcart_model)
+    def get(self, name):
+        """
+        Retrieve a single Shop Cart
+        This endpoint will return a Shop Cart based on it's id
+        """
+        app.logger.info("Request to Retrieve a shop cart with id [%s]", id)
+        shopcarts = Shopcart.filter_by_product_name(name)
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        return results, status.HTTP_200_OK
+'''
 ######################################################################
 # FILTER SHOP CARTS GIVEN A PRODUCT
 ######################################################################
@@ -407,7 +585,7 @@ def filter_shopcarts_by_product_name(product_name):
     shopcarts = Shopcart.filter_by_product_name(product_name)
     results = [shopcart.serialize() for shopcart in shopcarts]
     return make_response(jsonify(results), status.HTTP_200_OK)
-
+'''
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

@@ -116,9 +116,23 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart_not_found(self):
         """It should not Read a shopcart that is not found"""
-        resp = self.client.get(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        resp = self.client.get(f"{BASE_URL}/0",content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_create_product_with_no_id(self):
+        """Create a product without a name"""
+        """It should Add a product to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        product = ProductFactory()
+        new_product = product.serialize()
+        del new_product["name"]
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/products",
+            json=new_product,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
         shopcart = ShopCartFactory()
@@ -168,13 +182,13 @@ class TestShopcartService(TestCase):
         """It should raise 405 method not allowed error"""
         resp = self.client.post(f"{BASE_URL}")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
+    '''
     def test_415_media_not_supported(self):
         """It should raise 415 media not supported error"""
         text = "Hello World"
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
+    '''
     def test_500_error_handler(self):
         """It should return 500 error"""
         response = mock(
@@ -246,7 +260,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         resp = self.client.get(f"{BASE_URL}/123/products")
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
         resp = self.client.get(f"{BASE_URL}/{shopcart.id}/products")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -265,7 +279,7 @@ class TestShopcartService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         data = resp.get_json()
-        logging.debug(data)
+        logging.debug(data["id"])
         product_id = data["id"]
 
         # send delete request
