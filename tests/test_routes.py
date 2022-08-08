@@ -18,6 +18,7 @@ from service import app, routes
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
+from urllib.parse import quote_plus
 
 logging.disable(logging.CRITICAL)
 
@@ -242,10 +243,10 @@ class TestShopcartService(TestCase):
     def test_get_shopcart_by_id(self):
         """It should Get a shop cart by customer id"""
         shopcarts = self._create_shopcarts(3)
-        resp = self.client.get(BASE_URL, query_string=f"id={shopcarts[1].id}")
+        resp = self.client.get(f"{BASE_URL}/{shopcarts[1].id}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data[0]["id"], shopcarts[1].id)
+        self.assertEqual(data["id"], shopcarts[1].id)
 
     def test_read_items(self):
         """It should read all the items from a given shopcart"""
@@ -431,8 +432,11 @@ class TestShopcartService(TestCase):
                 content_type="application/json",
             )
         shopcarts = self._find_shopcarts(shopcarts)
-        resp = self.client.get(f"{BASE_URL}/products/{product.name}")
+        resp = self.client.get(
+            BASE_URL, query_string=f"name={quote_plus(product.name)}"
+        )
         data = resp.get_json()
+        logging.debug(data)
         self.assertEqual(len(data), 2)
         self.assertEqual(data[0]["id"], shopcarts[0].id)
         self.assertEqual(data[1]["id"], shopcarts[1].id)

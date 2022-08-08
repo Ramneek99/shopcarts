@@ -150,6 +150,7 @@ class ShopCartResource(Resource):
     # ------------------------------------------------------------------
     @api.doc("create_shopcarts")
     @api.response(400, "The posted data was not valid")
+    @api.response(409, "Shop Cart already exists")
     @api.expect(shopcart_model)
     @api.marshal_with(shopcart_model, code=201)
     def post(self, id):
@@ -317,7 +318,7 @@ class ProductResource(Resource):
     # UPDATE AN EXISTING Product
     # ------------------------------------------------------------------
     @api.doc("update_products")
-    @api.response(404, " not found")
+    @api.response(404, "Product not found")
     @api.response(400, "The posted Product data was not valid")
     @api.expect(product_model)
     @api.marshal_with(product_model)
@@ -355,6 +356,7 @@ class ProductOperation(Resource):
     # LIST ALL ProductS
     # ------------------------------------------------------------------
     @api.doc("list_products")
+    @api.response(404, "Shop Cart not found")
     @api.marshal_list_with(product_model)
     def get(self, id):
         """Returns the list of products in the shopcart"""
@@ -374,6 +376,7 @@ class ProductOperation(Resource):
     # ------------------------------------------------------------------
     @api.doc("add_products")
     @api.response(400, "The posted data was not valid")
+    @api.response(404, "Product not found")
     @api.expect(product_model)
     @api.marshal_with(product_model, code=201)
     def post(self, id):
@@ -531,10 +534,15 @@ class ShopcartCollection(Resource):
         """Returns all of the Shopcarts"""
         app.logger.info("Request for Shop Cart list")
         id = request.args.get("id")
+        name = request.args.get("name")
         results = []
         if id:
             shopcarts = Shopcart.find_by_id(id)
             results = [shopcarts.serialize()]
+        if name:
+            app.logger.info("Request to Retrieve a shop cart with id [%s]", id)
+            shopcarts = Shopcart.filter_by_product_name(name)
+            results = [shopcart.serialize() for shopcart in shopcarts]
         else:
             shopcarts = Shopcart.all()
             results = [shopcart.serialize() for shopcart in shopcarts]
@@ -613,13 +621,13 @@ def clear_shopcarts(id):
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
 '''
-
+'''
 ######################################################################
-#  PATH: /shopcarts/products/<name>
+#  PATH: /shopcarts?product_name = <name>
 ######################################################################
 
 
-@api.route("/shopcarts/products/<name>")
+@api.route("/shopcarts?product_name = <name>")
 @api.param("name", "The name of the product")
 class ShopcartQuery(Resource):
     # ------------------------------------------------------------------
@@ -638,7 +646,7 @@ class ShopcartQuery(Resource):
         return results, status.HTTP_200_OK
 
 
-'''
+
 ######################################################################
 # FILTER SHOP CARTS GIVEN A PRODUCT
 ######################################################################
