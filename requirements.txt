@@ -36,3 +36,6 @@ selenium==4.1.0
 compare==0.2b0
 requests==2.28.1
 webdriver-manager==3.8.2
+
+# API
+flask_restx==0.5.1
