@@ -18,6 +18,7 @@ from service import app, routes
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
+
 logging.disable(logging.CRITICAL)
 
 DATABASE_URI = os.getenv(
@@ -57,7 +58,6 @@ class TestShopcartService(TestCase):
         db.session.commit()
         self.client = app.test_client()
 
-
     def tearDown(self):
         """Runs once after each test case"""
         db.session.remove()
@@ -72,7 +72,9 @@ class TestShopcartService(TestCase):
         for _ in range(count):
             shopcart = ShopCartFactory()
             resp = self.client.post(
-                f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize(),content_type=CONTENT_TYPE_JSON
+                f"{BASE_URL}/{shopcart.id}",
+                json=shopcart.serialize(),
+                content_type=CONTENT_TYPE_JSON,
             )
             self.assertEqual(
                 resp.status_code,
@@ -116,7 +118,7 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart_not_found(self):
         """It should not Read a shopcart that is not found"""
-        resp = self.client.get(f"{BASE_URL}/0",content_type="application/json")
+        resp = self.client.get(f"{BASE_URL}/0", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_product_with_no_id(self):
@@ -132,14 +134,14 @@ class TestShopcartService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
         shopcart = ShopCartFactory()
         resp = self.client.post(
             f"{BASE_URL}/{shopcart.id}",
             json=shopcart.serialize(),
-            content_type="application/json"
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -182,6 +184,7 @@ class TestShopcartService(TestCase):
         """It should raise 405 method not allowed error"""
         resp = self.client.post(f"{BASE_URL}")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     '''
     def test_415_media_not_supported(self):
         """It should raise 415 media not supported error"""
@@ -189,6 +192,7 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
     '''
+
     def test_500_error_handler(self):
         """It should return 500 error"""
         response = mock(
