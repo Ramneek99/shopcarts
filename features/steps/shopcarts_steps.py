@@ -53,7 +53,7 @@ def step_impl(context):
         }
         context.resp = requests.post(f"{rest_endpoint}/{customer_id}/products", json=product_payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
-    rest_endpoint = f"{context.BASE_URL}/shopcarts"
+    rest_endpoint = f"{context.BASE_URL}/api/shopcarts"
     context.resp = requests.get(rest_endpoint)
     for shopcart in context.resp.json():
         logging.info(shopcart)

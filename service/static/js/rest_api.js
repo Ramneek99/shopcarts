@@ -382,7 +382,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `api/shopcarts/products/${name}`,
+            url: `api/shopcarts?product_name=${name}`,
             contentType: "application/json",
             data: ''
         })
