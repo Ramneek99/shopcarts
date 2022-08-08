@@ -21,6 +21,7 @@ def step_impl(context):
     context.resp = requests.get(rest_endpoint, headers=headers)
     expect(context.resp.status_code).to_equal(200)
     customer_id_set = set()
+    print(rest_endpoint)
     # delete all shopcarts and products
     for shopcart in context.resp.json():
         customer_id = shopcart["id"]

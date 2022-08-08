@@ -352,22 +352,20 @@ class ProductResource(Resource):
 @api.param("id", "The shop cart identifier")
 class ProductOperation(Resource):
     # ------------------------------------------------------------------
-    # LIST ALL PETS
+    # LIST ALL ProductS
     # ------------------------------------------------------------------
     @api.doc("list_products")
-    @api.marshal_with(shopcart_model)
+    @api.marshal_list_with(product_model)
     def get(self, id):
         """Returns the list of products in the shopcart"""
         app.logger.info("Request to list Products...")
-        products = []
         shopcart = Shopcart().find_by_id(id)
         if not shopcart:
             abort(
                 status.HTTP_404_NOT_FOUND,
                 "Shop Cart with id '{}' was not found.".format(id),
             )
-        products = shopcart.products
-        results = [product.serialize() for product in products]
+        results = [product.serialize() for product in shopcart.products]
         app.logger.info("[%s] Products returned", len(results))
         return results, status.HTTP_200_OK
 
