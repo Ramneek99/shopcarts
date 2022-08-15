@@ -14,17 +14,22 @@ from mockito import mock
 import requests
 
 # from unittest.mock import MagicMock, patch
-from service import app
+from service import app, routes
 from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
+from urllib.parse import quote_plus
 
+logging.disable(logging.CRITICAL)
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/shopcarts"
+
+BASE_URL = "api/shopcarts"
 PRODUCT_URL = "/product"
+
+CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -40,7 +45,7 @@ class TestShopcartService(TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        Shopcart.init_db(app)
+        routes.init_db()
 
     @classmethod
     def tearDownClass(cls):
@@ -52,7 +57,6 @@ class TestShopcartService(TestCase):
         db.session.query(Product).delete()
         db.session.query(Shopcart).delete()  # clean up the last tests
         db.session.commit()
-
         self.client = app.test_client()
 
     def tearDown(self):
@@ -63,13 +67,15 @@ class TestShopcartService(TestCase):
     #  H E L P E R   M E T H O D S
     ######################################################################
 
-    def _create_shopcarts(self, count):
+    def _create_shopcarts(self, count: int = 1) -> list:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
         for _ in range(count):
             shopcart = ShopCartFactory()
             resp = self.client.post(
-                f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize()
+                f"{BASE_URL}/{shopcart.id}",
+                json=shopcart.serialize(),
+                content_type=CONTENT_TYPE_JSON,
             )
             self.assertEqual(
                 resp.status_code,
@@ -113,7 +119,21 @@ class TestShopcartService(TestCase):
 
     def test_get_shopcart_not_found(self):
         """It should not Read a shopcart that is not found"""
-        resp = self.client.get(f"{BASE_URL}/0")
+        resp = self.client.get(f"{BASE_URL}/0", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_product_with_no_id(self):
+        """Create a product without a name"""
+        """It should Add a product to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        product = ProductFactory()
+        new_product = product.serialize()
+        del new_product["name"]
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/products",
+            json=new_product,
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_shopcart(self):
@@ -166,11 +186,13 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    '''
     def test_415_media_not_supported(self):
         """It should raise 415 media not supported error"""
         text = "Hello World"
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    '''
 
     def test_500_error_handler(self):
         """It should return 500 error"""
@@ -221,10 +243,10 @@ class TestShopcartService(TestCase):
     def test_get_shopcart_by_id(self):
         """It should Get a shop cart by customer id"""
         shopcarts = self._create_shopcarts(3)
-        resp = self.client.get(BASE_URL, query_string=f"id={shopcarts[1].id}")
+        resp = self.client.get(f"{BASE_URL}/{shopcarts[1].id}")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data[0]["id"], shopcarts[1].id)
+        self.assertEqual(data["id"], shopcarts[1].id)
 
     def test_read_items(self):
         """It should read all the items from a given shopcart"""
@@ -243,7 +265,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         resp = self.client.get(f"{BASE_URL}/123/products")
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
         resp = self.client.get(f"{BASE_URL}/{shopcart.id}/products")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -262,7 +284,7 @@ class TestShopcartService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         data = resp.get_json()
-        logging.debug(data)
+        logging.debug(data["id"])
         product_id = data["id"]
 
         # send delete request
@@ -410,8 +432,11 @@ class TestShopcartService(TestCase):
                 content_type="application/json",
             )
         shopcarts = self._find_shopcarts(shopcarts)
-        resp = self.client.get(f"{BASE_URL}/products/{product.name}")
+        resp = self.client.get(
+            BASE_URL, query_string=f"name={quote_plus(product.name)}"
+        )
         data = resp.get_json()
+        logging.debug(data)
         self.assertEqual(len(data), 2)
         self.assertEqual(data[0]["id"], shopcarts[0].id)
         self.assertEqual(data[1]["id"], shopcarts[1].id)

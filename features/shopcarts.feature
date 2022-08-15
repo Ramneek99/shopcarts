@@ -96,7 +96,7 @@ Scenario: Create Shopcart
     When I visit the "Home Page"
     And I set the "Customer ID" to "1"
     And I press the "Create" button
-    Then I should see the message "409 Conflict: Shopcart 1 already exists"
+    Then I should see the message "Shopcart 1 already exists"
     When I press the "Clear-Form" button
     Then the "Product ID" field should be empty 
     And the "Product Name" field should be empty

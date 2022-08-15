@@ -46,7 +46,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: `/shopcarts/${customer_id}`,
+            url: `api/shopcarts/${customer_id}`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -73,7 +73,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/${customer_id}`,
+            url: `api/shopcarts/${customer_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -102,7 +102,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/${customer_id}/products`,
+            url: `api/shopcarts/${customer_id}/products`,
             contentType: "application/json",
             data: ''
         })
@@ -157,7 +157,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/shopcarts/${customer_id}/clear`,
+                url: `api/shopcarts/${customer_id}/clear`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -184,7 +184,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${customer_id}`,
+            url: `api/shopcarts/${customer_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -230,7 +230,7 @@ $(function () {
         };
         let ajax = $.ajax({
             type: "POST",
-            url: `/shopcarts/${customer_id}/products`,
+            url: `api/shopcarts/${customer_id}/products`,
             contentType: "application/json",
             data: JSON.stringify(data),
         })
@@ -261,7 +261,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${customer_id}/products/${product_id}`,
+            url: `api/shopcarts/${customer_id}/products/${product_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -301,7 +301,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/shopcarts/${customer_id}/products/${product_id}`,
+            url: `api/shopcarts/${customer_id}/products/${product_id}`,
             contentType: "application/json",
             data: JSON.stringify(data),
         })
@@ -348,7 +348,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/shopcarts/${id}`,
+            url: `api/shopcarts/${id}`,
             contentType: "application/json",
             data: JSON.stringify(data1),
         })
@@ -382,7 +382,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/products/${name}`,
+            url: `api/shopcarts?product_name=${name}`,
             contentType: "application/json",
             data: ''
         })
@@ -431,7 +431,7 @@ $("#list-shopcart-btn").click(function () {
 
     let ajax = $.ajax({
         type: "GET",
-        url: `/shopcarts`,
+        url: `api/shopcarts`,
         contentType: "application/json",
         data: ''
     })
