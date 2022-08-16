@@ -536,9 +536,6 @@ class ShopcartCollection(Resource):
         id = request.args.get("id")
         name = request.args.get("name")
         results = []
-        if id:
-            shopcarts = Shopcart.find_by_id(id)
-            results = [shopcarts.serialize()]
         if name:
             app.logger.info("Request to Retrieve a shop cart with id [%s]", id)
             shopcarts = Shopcart.filter_by_product_name(name)

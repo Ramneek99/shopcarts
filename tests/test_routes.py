@@ -122,7 +122,7 @@ class TestShopcartService(TestCase):
         resp = self.client.get(f"{BASE_URL}/0", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_create_product_with_no_id(self):
+    def test_create_product_with_no_name(self):
         """Create a product without a name"""
         """It should Add a product to a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
@@ -132,6 +132,19 @@ class TestShopcartService(TestCase):
         resp = self.client.post(
             f"{BASE_URL}/{shopcart.id}/products",
             json=new_product,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_shopcart_with_no_id(self):
+        """Create a shopcart without an ud"""
+        shopcart = ShopCartFactory()
+        new_cart = shopcart.serialize()
+        cart_id = shopcart.id
+        del new_cart["id"]
+        resp = self.client.post(
+            f"{BASE_URL}/{cart_id}",
+            json=new_cart,
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -186,13 +199,13 @@ class TestShopcartService(TestCase):
         resp = self.client.post(f"{BASE_URL}")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    '''
+    
     def test_415_media_not_supported(self):
         """It should raise 415 media not supported error"""
         text = "Hello World"
         resp = self.client.post(f"{BASE_URL}/0", data=text, content_type="text/plain")
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-    '''
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    
 
     def test_500_error_handler(self):
         """It should return 500 error"""
@@ -247,6 +260,13 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["id"], shopcarts[1].id)
+
+    def test_get_shopcart_by_id_404(self):
+        """It should Get a shop cart by customer id, but return a 404 error"""
+        shopcarts = self._create_shopcarts(3)
+        shopcarts[0].id = 123456
+        resp = self.client.put(f"{BASE_URL}/123456", json=shopcarts[0].serialize())
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_read_items(self):
         """It should read all the items from a given shopcart"""
@@ -448,12 +468,12 @@ class TestShopcartService(TestCase):
         products = ProductFactory.create_batch(3)
         shopcart = ShopCartFactory(products=products)
         shopcart.id = shopcart_id
-        logging.debug(f"innitial Shopcart = {shopcart.serialize()}")
+        logging.debug(f"initial Shopcart = {shopcart.serialize()}")
         resp = self.client.post(f"{BASE_URL}/{shopcart.id}", json=shopcart.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         resp = self.client.get(f"{BASE_URL}/{shopcart.id}")
         returned_shopcart = resp.get_json()
-        logging.debug(f"Returned Shopcat = {returned_shopcart}")
+        logging.debug(f"Returned Shopcart = {returned_shopcart}")
         self.assertEqual(len(returned_shopcart["products"]), 3)
         product = ProductFactory()
         returned_shopcart["products"] = [product.serialize()]
