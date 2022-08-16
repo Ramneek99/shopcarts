@@ -235,7 +235,7 @@ class TestShopcartService(TestCase):
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
         self._create_shopcarts(5)
-        resp = self.client.get(BASE_URL)
+        resp = self.client.get(BASE_URL, id=1)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
@@ -461,3 +461,5 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_shopcart = resp.get_json()
         self.assertEqual(len(updated_shopcart["products"]), 1)
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id+100}", json=returned_shopcart)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
