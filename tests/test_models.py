@@ -159,7 +159,6 @@ class TestShopCart(unittest.TestCase):
         self.assertEqual(len(Shopcart.all()), 1)
         self.assertEqual(Shopcart.all()[0], shopcart2)
 
-
     def test_deserialize_with_key_error(self):
         """It should not Deserialize an shopcart with a KeyError"""
         shopcart = Shopcart()

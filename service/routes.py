@@ -43,6 +43,7 @@ create_model = api.model(
     },
 )
 
+
 product_model = api.inherit(
     "ProductModel",
     create_model,
@@ -107,7 +108,7 @@ class ShopCartResource(Resource):
     @api.doc("update_shopcarts")
     @api.response(404, "Shop Cart not found")
     @api.response(400, "The posted Shop Cart data was not valid")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_model, validate=True)
     @api.marshal_with(shopcart_model)
     def put(self, id):
         """
@@ -151,7 +152,7 @@ class ShopCartResource(Resource):
     @api.doc("create_shopcarts")
     @api.response(400, "The posted data was not valid")
     @api.response(409, "Shop Cart already exists")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_model, validate=True)
     @api.marshal_with(shopcart_model, code=201)
     def post(self, id):
         """
@@ -320,7 +321,7 @@ class ProductResource(Resource):
     @api.doc("update_products")
     @api.response(404, "Product not found")
     @api.response(400, "The posted Product data was not valid")
-    @api.expect(product_model)
+    @api.expect(product_model, validate=True)
     @api.marshal_with(product_model)
     def put(self, id, product_id):
         """
@@ -377,7 +378,7 @@ class ProductOperation(Resource):
     @api.doc("add_products")
     @api.response(400, "The posted data was not valid")
     @api.response(404, "Product not found")
-    @api.expect(product_model)
+    @api.expect(product_model, validate=True)
     @api.marshal_with(product_model, code=201)
     def post(self, id):
         """
@@ -578,7 +579,7 @@ class ShopcartAction(Resource):
     @api.doc("update_shopcarts")
     @api.response(404, "Shop Cart not found")
     @api.response(400, "The posted Shop Cart data was not valid")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_model, validate=True)
     @api.marshal_with(shopcart_model)
     def put(self, id):
         """
