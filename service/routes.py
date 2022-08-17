@@ -579,7 +579,7 @@ class ShopcartAction(Resource):
     @api.doc("update_shopcarts")
     @api.response(404, "Shop Cart not found")
     @api.response(400, "The posted Shop Cart data was not valid")
-    @api.expect(shopcart_model, validate=True)
+    # @api.expect(shopcart_model, validate=True)
     @api.marshal_with(shopcart_model)
     def put(self, id):
         """
