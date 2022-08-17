@@ -43,14 +43,23 @@ create_model = api.model(
     },
 )
 
-product_model = api.inherit(
-    "ProductModel",
-    create_model,
+
+product_model = api.model(
+    "Product",
+    # create_model,
     {
-        "id": fields.String(
+        "id": fields.Integer(
             readOnly=True, description="The unique id assigned internally by service"
         ),
-    },
+        "name": fields.String(required=True, description="The name of the Product", maxLength=260),
+        "quantity": fields.Integer(
+            required=True, description="The quantity of the Product"
+        ),
+        "price": fields.Float(required=True, description="The price of the Product"),
+        "shopcart_id": fields.Integer(
+            required=True, description="The shop cart id of the product"
+        ),
+    }
 )
 shopcart_model = api.model(
     "ShopcartModel",
@@ -63,6 +72,17 @@ shopcart_model = api.model(
         ),
     },
 )
+
+product_parser = api.parser()
+product_parser.add_argument('id', type=int)
+product_parser.add_argument('name', type=str)
+product_parser.add_argument('quantity', type=int)
+product_parser.add_argument('price', type=float)
+product_parser.add_argument('shopcart_id', type=int)
+
+shopcart_parser = api.parser()
+shopcart_parser.add_argument('id', type=int)
+shopcart_parser.add_argument('products', type=list)
 
 ######################################################################
 #  PATH: /shopcarts/{id}
@@ -107,13 +127,14 @@ class ShopCartResource(Resource):
     @api.doc("update_shopcarts")
     @api.response(404, "Shop Cart not found")
     @api.response(400, "The posted Shop Cart data was not valid")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_parser, validate=True)
     @api.marshal_with(shopcart_model)
     def put(self, id):
         """
         Update a Shop Cart
         This endpoint will update a Shop Cart based the body that is posted
         """
+        shopcart_parser.parse_args()
         app.logger.info("Request to Update a Shop Cart with id [%s]", id)
         shopcart = Shopcart.find_by_id(id)
         if not shopcart:
@@ -151,13 +172,14 @@ class ShopCartResource(Resource):
     @api.doc("create_shopcarts")
     @api.response(400, "The posted data was not valid")
     @api.response(409, "Shop Cart already exists")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_parser, validate=True)
     @api.marshal_with(shopcart_model, code=201)
     def post(self, id):
         """
         Creates a Shop Cart
         This endpoint will create a Shop Cart based the data in the body that is posted
         """
+        shopcart_parser.parse_args()
         app.logger.info("Request to Create a Shop Cart")
         shopcart = Shopcart()
         app.logger.debug("Payload = %s", api.payload)
@@ -320,13 +342,14 @@ class ProductResource(Resource):
     @api.doc("update_products")
     @api.response(404, "Product not found")
     @api.response(400, "The posted Product data was not valid")
-    @api.expect(product_model)
+    @api.expect(product_parser, validate=True)
     @api.marshal_with(product_model)
     def put(self, id, product_id):
         """
         Update a Product
         This endpoint will update a Product based the body that is posted
         """
+        args = product_parser.parse_args()
         app.logger.info(
             "Request to Update a Product with id [%s] for customer with id [%s]",
             product_id,
@@ -339,8 +362,8 @@ class ProductResource(Resource):
                 "Product with id '{}' was not found.".format(product_id),
             )
         app.logger.debug("Payload = %s", api.payload)
-        data = api.payload
-        product.deserialize(data)
+        # data = api.payload
+        product.deserialize(args)
         product.id = product_id
         product.update()
         return product.serialize(), status.HTTP_200_OK
@@ -377,13 +400,14 @@ class ProductOperation(Resource):
     @api.doc("add_products")
     @api.response(400, "The posted data was not valid")
     @api.response(404, "Product not found")
-    @api.expect(product_model)
+    @api.expect(product_parser, validate=True)
     @api.marshal_with(product_model, code=201)
     def post(self, id):
         """
         Creates a Product
         This endpoint will create a Product and add it to the shopcart based the data in the body that is posted
         """
+        product_parser.parse_args()
         app.logger.info("Request to Create a Product")
         shopcart = Shopcart().find_by_id(id)
         if not shopcart:
@@ -578,7 +602,7 @@ class ShopcartAction(Resource):
     @api.doc("update_shopcarts")
     @api.response(404, "Shop Cart not found")
     @api.response(400, "The posted Shop Cart data was not valid")
-    @api.expect(shopcart_model)
+    @api.expect(shopcart_parser, validate=True)
     @api.marshal_with(shopcart_model)
     def put(self, id):
         """
@@ -586,6 +610,7 @@ class ShopcartAction(Resource):
         This endpoint will update a Shop Cart based the body that is posted
         """
         app.logger.info("Request to Update a Shop Cart with id [%s]", id)
+        shopcart_parser.parse_args()
         shopcart = Shopcart.find_by_id(id)
         if not shopcart:
             abort(

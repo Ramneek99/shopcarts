@@ -48,6 +48,7 @@ api = Api(
     default_label="Shop Cart shop operations",
     doc="/apidocs",  # default also could use doc='/apidocs/'
     prefix="/api",
+    format_checker=("str")
 )
 
 # Import the routes After the Flask app is created

@@ -57,6 +57,7 @@ class TestShopCart(unittest.TestCase):
         shopcart = Shopcart(
             id=fake_shopcart.id,
         )
+        shopcart.create(shopcart.id)
         self.assertIsNotNone(shopcart)
         self.assertEqual(shopcart.id, fake_shopcart.id)
 
@@ -140,6 +141,23 @@ class TestShopCart(unittest.TestCase):
         new_shopcart = Shopcart()
         new_shopcart.deserialize(serial_shopcart)
         self.assertEqual(new_shopcart.id, shopcart.id)
+
+    def test_shopcart_repr(self):
+        """It should Repr a shopcart"""
+        shopcart = ShopCartFactory()
+        shopcart.create(shopcart.id)
+        self.assertEqual(shopcart.__repr__(), "<Shopcart %r id=[%s]>" % (shopcart.id, shopcart.id))
+
+    def test_shopcart_delete_products(self):
+        shopcart = ShopCartFactory()
+        shopcart2 = ShopCartFactory()
+        shopcart.products.append(ProductFactory())
+        shopcart.products.append(ProductFactory())
+        shopcart.create(shopcart.id)
+        shopcart2.create(shopcart2.id)
+        shopcart.delete()
+        self.assertEqual(len(Shopcart.all()), 1)
+        self.assertEqual(Shopcart.all()[0], shopcart2)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize an shopcart with a KeyError"""

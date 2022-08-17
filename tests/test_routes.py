@@ -19,7 +19,7 @@ from service.models import db, Shopcart, Product
 from service.utils import status  # HTTP Status Codes
 from tests.factories import ShopCartFactory, ProductFactory
 from urllib.parse import quote_plus
-
+from flask import Flask
 logging.disable(logging.CRITICAL)
 
 DATABASE_URI = os.getenv(
@@ -33,6 +33,14 @@ CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
+class CustomFlask(Flask):
+    """Custom Flask app for test"""
+    def test_request_context(self, *args, **kwargs):
+        headers = kwargs.setdefault("headers", {})
+        headers.setdefault("Content-Type", CONTENT_TYPE_JSON)
+        return super().test_request_context(*args, **kwargs)
 
 
 class TestShopcartService(TestCase):
@@ -239,6 +247,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
+        resp = self.client.get(f"{BASE_URL}?id={data[0]['id']}")
 
     def test_get_shopcart_by_id(self):
         """It should Get a shop cart by customer id"""
@@ -414,6 +423,7 @@ class TestShopcartService(TestCase):
         resp = self.client.put(
             f"{BASE_URL}/{shopcart.id}/products/125",
             content_type="application/json",
+            json=data
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -461,3 +471,10 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_shopcart = resp.get_json()
         self.assertEqual(len(updated_shopcart["products"]), 1)
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id+100}", json=returned_shopcart)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_check_content_type(self):
+        customApp = CustomFlask(import_name="Test App")
+        with customApp.test_request_context():
+            routes.check_content_type(CONTENT_TYPE_JSON)
