@@ -42,6 +42,7 @@ class CustomFlask(Flask):
         headers.setdefault("Content-Type", CONTENT_TYPE_JSON)
         return super().test_request_context(*args, **kwargs)
 
+
 class TestShopcartService(TestCase):
     """Shop Cart Service Tests"""
 
