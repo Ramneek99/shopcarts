@@ -423,6 +423,7 @@ class TestShopcartService(TestCase):
         resp = self.client.put(
             f"{BASE_URL}/{shopcart.id}/products/125",
             content_type="application/json",
+            json=data
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
