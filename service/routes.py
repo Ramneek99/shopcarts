@@ -12,7 +12,6 @@ DELETE /shopcarts/{id} - deletes a Shopcart record in the database
 """
 
 import logging
-from unittest.util import _MAX_LENGTH
 from flask import request, abort
 from flask_restx import Resource, fields
 from service.models import Product, Shopcart
