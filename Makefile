@@ -1,13 +1,13 @@
 ## Add some environment variables
 REGISTRY ?= icr.io
-NAMESPACE ?= nyu_devops
+NAMESPACE ?= ramneek
 IMAGE_NAME ?= shopcarts
 IMAGE_TAG ?= 1.0
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
 # PLATFORM ?= "linux/amd64,linux/arm64"
 PLATFORM ?= "linux/amd64"
 CLUSTER ?= nyu-devops
-RESOURCE_GROUP_ID ?= b6f897e8eb35445596abefc181e16f1a
+# RESOURCE_GROUP_ID ?= 0e42a65e381d454285fa2d924868da53 #b6f897e8eb35445596abefc181e16f1a
 
 
 help: ## Display this help
