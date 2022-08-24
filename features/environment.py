@@ -4,8 +4,8 @@ Environment for Behave Testing
 from os import getenv
 from selenium import webdriver
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '120'))
-BASE_URL = getenv('BASE_URL', 'http://159.122.175.207:31001/')
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
+BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
 
 
 def before_all(context):
