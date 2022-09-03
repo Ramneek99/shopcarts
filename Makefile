@@ -1,6 +1,6 @@
 ## Add some environment variables
 REGISTRY ?= icr.io
-NAMESPACE ?= ramneek
+NAMESPACE ?= nidhi
 IMAGE_NAME ?= shopcarts
 IMAGE_TAG ?= 1.0
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
