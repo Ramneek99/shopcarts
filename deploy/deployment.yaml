@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: shopcarts
-        image: icr.io/ramneek/shopcarts:1.0
+        image: icr.io/nidhi/shopcarts:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
